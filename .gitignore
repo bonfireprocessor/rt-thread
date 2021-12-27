@@ -50,3 +50,4 @@ CMakeLists.txt
 cmake-build-debug
 *.mk
 rt-thread-x.code-workspace
+*.lst

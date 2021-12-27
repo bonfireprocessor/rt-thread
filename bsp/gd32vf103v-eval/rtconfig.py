@@ -61,3 +61,4 @@ if PLATFORM == 'gcc':
 
     POST_ACTION = OBJCPY + ' -O binary $TARGET ' + TARGET_NAME + '\n'
     POST_ACTION += SIZE + ' $TARGET\n'
+    POST_ACTION += OBJDUMP + ' -S -d $TARGET >rtthread.lst\n'
