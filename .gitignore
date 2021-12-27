@@ -23,6 +23,7 @@ documentation/html
 *.a
 *.i
 *.d
+*.lst
 tools/kconfig-frontends/kconfig-mconf
 packages
 dist
@@ -42,3 +43,4 @@ tags
 .history
 CMakeLists.txt
 cmake-build-debug
+libcpu/risc-v/common/cpuport.s
