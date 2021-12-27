@@ -25,10 +25,6 @@ documentation/html
 *.a
 *.i
 *.d
-*.dfinish
-*.su
-#source insight 4 project files
-*.si4project 
 *.lst
 tools/kconfig-frontends/kconfig-mconf
 packages
@@ -54,3 +50,4 @@ rt-thread-x.code-workspace
 *.lst
 libcpu/risc-v/common/cpuport.s
 rt-thread.code-workspace
+libcpu/risc-v/common/cpuport.s
