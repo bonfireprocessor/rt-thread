@@ -1,6 +1,6 @@
 import os
 ARCH     = 'risc-v'
-CPU      = 'e310'
+CPU      = 'bonfire'
 # toolchains options
 CROSS_TOOL  = 'gcc'
 
@@ -23,7 +23,7 @@ BUILD = 'debug'
 
 CORE = 'risc-v'
 MAP_FILE = 'rtthread.map'
-LINK_FILE = './freedom-e-sdk/bsp/env/freedom-e300-hifive1/flash.lds'
+LINK_FILE = './bonfire-sdk/ld/ram_arty_axi.ld'
 TARGET_NAME = 'rtthread.bin'
 
 #------- GCC settings ----------------------------------------------------------
@@ -44,15 +44,18 @@ if PLATFORM == 'gcc':
     OBJDUMP = PREFIX + 'objdump'
     OBJCPY = PREFIX + 'objcopy'
 
-    DEVICE = ' -march=rv32imac -mabi=ilp32 -DUSE_PLIC -DUSE_M_TIME -DNO_INIT -mcmodel=medany -msmall-data-limit=8 -L.  -nostartfiles  -lc '
+    INCDIRS = ' -I./bonfire-sdk/inc -I./bonfire-sdk/boards/ARTY_AXI -I./drivers '
+
+    DEVICE = ' -march=rv32imac -mabi=ilp32 -mstrict-align -mcmodel=medany  -nostartfiles  -lc '
     CFLAGS = DEVICE
     CFLAGS += ' -save-temps=obj'
+    CFLAGS +=  INCDIRS
     AFLAGS = '-c'+ DEVICE + ' -x assembler-with-cpp'
-    AFLAGS += ' -Iplatform -Ifreedom-e-sdk/bsp/include -Ifreedom-e-sdk/bsp/env'
+    AFLAGS += INCDIRS
     LFLAGS = DEVICE
     LFLAGS += ' -Wl,--gc-sections,-cref,-Map=' + MAP_FILE
-    LFLAGS += ' -T ' + LINK_FILE
-    LFLAGS += ' -Wl,-wrap=memset'
+    LFLAGS += ' -L./bonfire-sdk/ld  -T ' + LINK_FILE
+   
 
     CPATH = ''
     LPATH = ''
