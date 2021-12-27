@@ -70,53 +70,60 @@ void SystemIrqHandler(uint32_t mcause,uint32_t mepc,void *trapframe)
 
 #if defined(RT_USING_USER_MAIN) && defined(RT_USING_HEAP)
 
-static void * rt_heap = NULL;
+//static void * rt_heap = NULL;
+extern int  end;              /* start of free memory (as symbol) */
+extern int  _endofheap;
+
+           /* end of free memory */
+static void *heap_ptr = (void *)&end;         /* Previous end */
 
 RT_WEAK void *rt_heap_begin_get(void)
 {
-    if (!rt_heap) rt_heap = malloc(RT_HEAP_SIZE);
-    RT_ASSERT(rt_heap!=NULL);
-    BOARD_DEBUG("Allocated rt_heap at %lx, size %ld\n",rt_heap,RT_HEAP_SIZE);
+    // if (!rt_heap) rt_heap = malloc(RT_HEAP_SIZE);
+    // RT_ASSERT(rt_heap!=NULL);
+    BOARD_DEBUG("Allocated rt_heap at %lx, size %ld\n",heap_ptr,(void*)&_endofheap - heap_ptr );
 
-    return rt_heap;
+    return heap_ptr;
 }
 
 RT_WEAK void *rt_heap_end_get(void)
-{   RT_ASSERT(rt_heap!=NULL);
-    return rt_heap + RT_HEAP_SIZE;
+{ 
+  //  RT_ASSERT(rt_heap!=NULL);
+//     return rt_heap + RT_HEAP_SIZE;
+    return (void*)&_endofheap;;
 }
 #endif
 
-#ifdef RT_USING_MUTEX
-static struct rt_mutex malloc_mutex;
-#endif
+// #ifdef RT_USING_MUTEX
+// static struct rt_mutex malloc_mutex;
+// #endif
 
-// Newlib hooks
+// // Newlib hooks
 
-// If Mutexes are enabled (RT_USING_MUTEX defined) and Scheduler is started (rt_thread_self() !=NULL) malloc_lock/unlock will 
-// use a mutex. Otherwise it will use a critical section
+// // If Mutexes are enabled (RT_USING_MUTEX defined) and Scheduler is started (rt_thread_self() !=NULL) malloc_lock/unlock will 
+// // use a mutex. Otherwise it will use a critical section
 
-void __malloc_lock(struct _reent *r)   {
+// void __malloc_lock(struct _reent *r)   {
 
-   //BOARD_DEBUG("Malloc lock called\n");
-   #ifdef RT_USING_MUTEX
-   if (rt_thread_self())
-     rt_mutex_take(&malloc_mutex,10);
-   else 
-   #endif
-     rt_enter_critical();  
-};
+//    //BOARD_DEBUG("Malloc lock called\n");
+//    #ifdef RT_USING_MUTEX
+//    if (rt_thread_self())
+//      rt_mutex_take(&malloc_mutex,10);
+//    else 
+//    #endif
+//      rt_enter_critical();  
+// };
 
 
-void __malloc_unlock(struct _reent *r) {
-    //BOARD_DEBUG("Malloc unlock called\n");
-    #ifdef RT_USING_MUTEX
-    if (rt_thread_self())
-      rt_mutex_release(&malloc_mutex);
-    else
-    #endif
-      rt_exit_critical(); 
-};
+// void __malloc_unlock(struct _reent *r) {
+//     //BOARD_DEBUG("Malloc unlock called\n");
+//     #ifdef RT_USING_MUTEX
+//     if (rt_thread_self())
+//       rt_mutex_release(&malloc_mutex);
+//     else
+//     #endif
+//       rt_exit_critical(); 
+// };
 
 
 
@@ -144,9 +151,9 @@ void rt_hw_board_init(void)
     rt_system_heap_init(rt_heap_begin_get(), rt_heap_end_get());
 #endif
 
-   #ifdef RT_USING_MUTEX
-   rt_mutex_init(&malloc_mutex,"malloc",RT_IPC_FLAG_PRIO);
-   #endif 
+  //  #ifdef RT_USING_MUTEX
+  //  rt_mutex_init(&malloc_mutex,"malloc",RT_IPC_FLAG_PRIO);
+  //  #endif 
 }
 
 
