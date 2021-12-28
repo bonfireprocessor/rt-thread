@@ -61,10 +61,14 @@ if PLATFORM == 'gcc':
     LPATH = ''
 
     if BUILD == 'debug':
-        CFLAGS += ' -O0 -g3'
+        print("Debug build")
+        CFLAGS += ' -Og -g3'
         AFLAGS += ' -g3'
     else:
-        CFLAGS += ' -O2'
+        CFLAGS += ' -g -O2'
 
     POST_ACTION = OBJCPY + ' -O binary $TARGET ' + TARGET_NAME + '\n'
     POST_ACTION += SIZE + ' $TARGET\n'
+    POST_ACTION += OBJDUMP + ' -S -d $TARGET >rtthread.lst\n'
+    if os.getenv("UPLOAD_DIR"):       
+        POST_ACTION += 'cp ' + TARGET_NAME + ' ' + os.getenv("UPLOAD_DIR")

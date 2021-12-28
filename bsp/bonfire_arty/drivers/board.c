@@ -125,5 +125,12 @@ char rt_hw_console_getchar(void)
 #endif
 
 
+
+// char rt_hw_console_getchar(void)
+// {
+//   return uart_wait_receive(0);
+// }
+
+
 #endif
 
