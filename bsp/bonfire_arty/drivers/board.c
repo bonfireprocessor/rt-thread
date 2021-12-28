@@ -10,9 +10,9 @@
 #include <rtthread.h>
 #include "bonfire.h"
 #include "uart.h"
-#include <reent.h>
+//#include <reent.h>
 #include "board.h"
-#include <malloc.h>
+//#include <malloc.h>
 
 
 static volatile uint32_t *pmtime = (uint32_t*)MTIME_BASE; // Pointer to memory mapped RISC-V Timer registers
@@ -94,37 +94,22 @@ RT_WEAK void *rt_heap_end_get(void)
 }
 #endif
 
-// #ifdef RT_USING_MUTEX
-// static struct rt_mutex malloc_mutex;
-// #endif
-
-// // Newlib hooks
-
-// // If Mutexes are enabled (RT_USING_MUTEX defined) and Scheduler is started (rt_thread_self() !=NULL) malloc_lock/unlock will 
-// // use a mutex. Otherwise it will use a critical section
-
-// void __malloc_lock(struct _reent *r)   {
-
-//    //BOARD_DEBUG("Malloc lock called\n");
-//    #ifdef RT_USING_MUTEX
-//    if (rt_thread_self())
-//      rt_mutex_take(&malloc_mutex,10);
-//    else 
-//    #endif
-//      rt_enter_critical();  
-// };
 
 
-// void __malloc_unlock(struct _reent *r) {
-//     //BOARD_DEBUG("Malloc unlock called\n");
-//     #ifdef RT_USING_MUTEX
-//     if (rt_thread_self())
-//       rt_mutex_release(&malloc_mutex);
-//     else
-//     #endif
-//       rt_exit_critical(); 
-// };
+void rt_hw_cpu_shutdown()
+{
+     clear_csr(mie,MIP_MTIP); // Disable Timer Interrupt
+     rt_hw_interrupt_disable();
 
+     void (*sram_base)() = (void*)SRAM_BASE;
+     sram_base();
+}
+
+static void assert_handler(const char *ex_string, const char *func, rt_size_t line)
+{
+   rt_kprintf("(%s) assertion failed at function:%s, line number:%d \n", ex_string, func, line);
+   rt_hw_cpu_shutdown();         
+} 
 
 
 /**
@@ -133,12 +118,7 @@ RT_WEAK void *rt_heap_end_get(void)
 void rt_hw_board_init(void)
 {
 
-    /* 
-     * TODO 1: OS Tick Configuration
-     * Enable the hardware timer and call the rt_os_tick_callback function
-     * periodically with the frequency RT_TICK_PER_SECOND. 
-     */
-
+    rt_assert_set_hook(assert_handler);
     mtime_setinterval( ((long)(SYSCLK/RT_TICK_PER_SECOND)));
 
     /* Call components board initial (use INIT_BOARD_EXPORT()) */
@@ -151,19 +131,10 @@ void rt_hw_board_init(void)
     rt_system_heap_init(rt_heap_begin_get(), rt_heap_end_get());
 #endif
 
-  //  #ifdef RT_USING_MUTEX
-  //  rt_mutex_init(&malloc_mutex,"malloc",RT_IPC_FLAG_PRIO);
-  //  #endif 
-}
+#if defined(RT_USING_CONSOLE) && defined(RT_USING_DEVICE)
+    rt_console_set_device(RT_CONSOLE_DEVICE_NAME);
+#endif
 
-
-void rt_hw_cpu_shutdown()
-{
-     clear_csr(mie,MIP_MTIP); // Disable Timer Interrupt
-     rt_hw_interrupt_disable();
-
-     void (*sram_base)() = (void*)SRAM_BASE;
-     sram_base();
 }
 
 
@@ -187,11 +158,12 @@ void rt_hw_console_output(const char *str)
    }    
 }
 
-
-// char rt_hw_console_getchar(void)
-// {
-//   return uart_wait_receive(0);
-// }
+#ifndef RT_USING_DEVICE
+char rt_hw_console_getchar(void)
+{
+  return uart_wait_receive(0);
+}
+#endif
 
 
 #endif
