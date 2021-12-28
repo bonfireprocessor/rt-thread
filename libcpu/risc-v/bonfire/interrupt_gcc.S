@@ -57,12 +57,33 @@ IRQ_Handler:
 
     /* switch to interrupt stack */
     la    sp, _stacktop
+    csrr s3, mcause
+    // Check if interrupt or trap 
+    bltz s3, handle_interrupt
 
-    /* interrupt handle */
+
+/* Handle Trap */  
+    csrr  a0, mcause
+    csrr  a1, mepc
+    csrr  a2, mstatus
+    STORE a2,   2 * REGBYTES(sp) // Write "orginal" mstatus to stackframe
+    mv    a3, s0 // Stackframe from interrupted thread
+    call  SystemTrapHandler
+    move sp, s0
+    // Restore mepc and mstatus to the values set by trap handler
+    LOAD  t0,  0(sp)
+    csrw mepc, t0
+    LOAD  t0, 2 * REGBYTES(sp)
+    csrw mstatus, t0
+    j restore // restore registers and mret 
+
+  handle_interrupt:
+    /* interrupt handler */
     call  rt_interrupt_enter
     csrr  a0, mcause
     csrr  a1, mepc
-    mv    a2, sp
+    csrr  a2, mstatus
+    mv    a3, s0 // Stackframe from interrupted thread
     call  SystemIrqHandler
     call  rt_interrupt_leave
 
@@ -99,6 +120,7 @@ spurious_interrupt:
     LOAD  t0,   2 * REGBYTES(sp)
     csrs  mstatus, t0 
 
+restore:
     LOAD  x4,   4 * REGBYTES(sp)
     LOAD  x5,   5 * REGBYTES(sp)
     LOAD  x6,   6 * REGBYTES(sp)
@@ -130,3 +152,5 @@ spurious_interrupt:
 
     addi  sp, sp, 32 * REGBYTES
     mret
+
+

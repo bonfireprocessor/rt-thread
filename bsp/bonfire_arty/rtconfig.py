@@ -48,7 +48,7 @@ if PLATFORM == 'gcc':
 
     DEVICE = ' -march=rv32imac -mabi=ilp32 -mstrict-align -mcmodel=medany  -nostartfiles  -lc '
     CFLAGS = DEVICE
-    CFLAGS += ' -save-temps=obj'
+    #CFLAGS += ' -save-temps=obj'
     CFLAGS +=  INCDIRS
     AFLAGS = '-c'+ DEVICE + ' -x assembler-with-cpp'
     AFLAGS += INCDIRS
