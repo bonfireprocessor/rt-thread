@@ -8,6 +8,7 @@
 #include "string.h"
 #include "malloc.h"
 #include "stdio.h"
+#include "mem_rw.h"
 
 
 static void reboot(int argc, char** argv)
@@ -51,6 +52,9 @@ static void test(int argc,char **argv)
   // for(int i=0;i<argc;i++) {
   //   rt_kprintf("Arg %d: %s\n",i,argv[i]);
   // }
+
+static volatile rt_uint32_t *crash;
+
   if (argc>=2) {
      switch (argv[1][0]) {
        case 'm':
@@ -79,7 +83,16 @@ static void test(int argc,char **argv)
           } else {  
             rt_timer_delete(timer);
             timer=NULL;
-          }            
+          }
+          break;
+        case 'r':
+          if (argc>=3) {
+            sscanf(argv[2],"%x",&crash);
+            rt_kprintf("%x\n",*crash); 
+          }
+           
+         
+        
                     
      }
   }
