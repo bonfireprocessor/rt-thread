@@ -45,7 +45,6 @@ static int count=0;
 
 #ifdef RT_USING_FINSH
 
-
 static void test(int argc,char **argv)
 {
  

@@ -16,6 +16,7 @@
 #include <rtdevice.h>
 #include "bonfire.h"
 
+#include <rtdevice.h>
 #include "uart.h"
 #include "interrupt.h"
 #include "board.h"
