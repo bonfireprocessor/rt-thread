@@ -7,9 +7,9 @@
  * Date           Author       Notes
  */
 
+#if defined(RT_USING_DEVICE) && defined(RT_USING_SERIAL) 
+
 #include <rtdevice.h>
-
-
 #include "uart.h"
 
 // static void usart_handler(int vector, void *param)
@@ -81,7 +81,7 @@ int rt_hw_uart_init(void)
   
     rt_hw_serial_register(
         &serial,
-        "dusart",
+        RT_CONSOLE_DEVICE_NAME,
         RT_DEVICE_FLAG_STREAM
         | RT_DEVICE_FLAG_RDWR,  //  | RT_DEVICE_FLAG_INT_RX
          RT_NULL);
@@ -98,3 +98,4 @@ int rt_hw_uart_init(void)
 }
 INIT_BOARD_EXPORT(rt_hw_uart_init);
 
+#endif

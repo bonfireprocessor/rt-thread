@@ -1,6 +1,8 @@
 
 #include "rtthread.h"
-//#include "shell.h"
+#ifdef RT_USING_FINSH
+#include "shell.h"
+#endif
 //#include "bonfire.h"
 #include "rthw.h"
 #include "string.h"
@@ -40,6 +42,7 @@ static int count=0;
     sendMessage(msg);
 }
 
+#ifdef RT_USING_FINSH
 
 static void test(int argc,char **argv)
 {
@@ -82,8 +85,10 @@ static void test(int argc,char **argv)
   }
 }
 
-//MSH_CMD_EXPORT(test,Usage: test m or test t)
+MSH_CMD_EXPORT(test,Usage: test m or test t)
+#endif
 
+#ifndef RT_USING_FINSH
 
 void sender()
 {
@@ -96,22 +101,23 @@ void sender()
 
 }
 
+#endif
+
 int main() {
 
 char * message;
 
-  //rt_kprintf("Pulling finsh_system_init:  %lx\n",finsh_system_init);
   mb = rt_mb_create("mb01",1,RT_IPC_FLAG_FIFO);
   RT_ASSERT(mb);
   
+  #ifndef RT_USING_FINSH
   rt_thread_t t2 = rt_thread_create("Sender",sender,NULL,2048,16,100);
   RT_ASSERT(t2);
   rt_thread_startup(t2);
+  #endif
 
-  //timer=rt_timer_create("tim01",messageTimerCallBack,NULL,2000,RT_TIMER_FLAG_PERIODIC|RT_TIMER_FLAG_SOFT_TIMER);
-  //rt_kprintf("Timer %lx created\n",timer);
   while (1) {
-    rt_kprintf("thread %s\n",rt_thread_self()->name);
+    //t_kprintf("thread %s\n",rt_thread_self()->name);
     //rt_thread_mdelay(1000);
     rt_err_t err=rt_mb_recv(mb,(rt_ubase_t *)&message,10000);
     if (err==RT_EOK) {
