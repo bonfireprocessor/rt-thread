@@ -24,6 +24,11 @@
 /* kservice optimization */
 
 #define RT_DEBUG
+#define RT_DEBUG_COLOR
+#define RT_DEBUG_INIT_CONFIG
+#define RT_DEBUG_INIT 1
+#define RT_DEBUG_MEMHEAP_CONFIG
+#define RT_DEBUG_MEMHEAP 1
 
 /* Inter-Thread communication */
 
@@ -46,12 +51,22 @@
 #define RT_USING_CONSOLE
 #define RT_CONSOLEBUF_SIZE 128
 #define RT_CONSOLE_DEVICE_NAME "uart"
-#define RT_VER_NUM 0x40101
+#define RT_VER_NUM 0x40100
 
 /* RT-Thread Components */
 
-#define RT_USING_MSH
+#define RT_USING_COMPONENTS_INIT
+#define RT_USING_USER_MAIN
+#define RT_MAIN_THREAD_STACK_SIZE 2048
+#define RT_MAIN_THREAD_PRIORITY 10
+
+/* C++ features */
+
+
+/* Command shell */
+
 #define RT_USING_FINSH
+#define RT_USING_MSH
 #define FINSH_USING_MSH
 #define FINSH_THREAD_NAME "tshell"
 #define FINSH_THREAD_PRIORITY 20
@@ -67,11 +82,6 @@
 /* Device Drivers */
 
 #define RT_USING_DEVICE_IPC
-#define RT_USING_SERIAL
-#define RT_USING_SERIAL_V1
-#define RT_SERIAL_USING_DMA
-#define RT_SERIAL_RB_BUFSZ 64
-#define RT_USING_PIN
 
 /* Using USB */
 
