@@ -20,5 +20,7 @@
 #define BOARD_DEBUG(...)
 #endif
 
+uint32_t mtime_setinterval(uint32_t interval);
+
 
 #endif
