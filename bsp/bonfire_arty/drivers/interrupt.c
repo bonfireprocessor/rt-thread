@@ -218,7 +218,14 @@ trapframe_t t;
     for(int i=3;i<32;i++) {
       *sr++=t.gpr[i];
     }
-
+    BonfireHandleTrap(&t);
+    f->epc=t.epc;
+    f->mstatus=t.status;
+    f->ra=t.gpr[1];
+    sr = (uint32_t*)&f->gp;
+    for(int i=3;i<32;i++) {
+      *sr++=t.gpr[i]; 
+    }
 
 }
 

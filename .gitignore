@@ -51,3 +51,4 @@ rt-thread-x.code-workspace
 libcpu/risc-v/common/cpuport.s
 rt-thread.code-workspace
 libcpu/risc-v/common/cpuport.s
+rt-thread.code-workspace
