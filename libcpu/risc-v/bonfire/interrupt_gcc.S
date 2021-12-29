@@ -19,8 +19,8 @@ IRQ_Handler:
     /* save all from thread context */
     addi sp, sp, -32 * REGBYTES
 
-    STORE x1,   1 * REGBYTES(sp)
-    
+    STORE x1,   1 * REGBYTES(sp) 
+    STORE x3,   3 * REGBYTES(sp)
     STORE x4,   4 * REGBYTES(sp)
     STORE x5,   5 * REGBYTES(sp)
     STORE x6,   6 * REGBYTES(sp)
@@ -75,6 +75,7 @@ IRQ_Handler:
     csrw mepc, t0
     LOAD  t0, 2 * REGBYTES(sp)
     csrw mstatus, t0
+    LOAD  x1,   1 * REGBYTES(sp)
     j restore // restore registers and mret 
 
   handle_interrupt:
@@ -121,6 +122,7 @@ spurious_interrupt:
     csrs  mstatus, t0 
 
 restore:
+    LOAD  x3,   3 * REGBYTES(sp)
     LOAD  x4,   4 * REGBYTES(sp)
     LOAD  x5,   5 * REGBYTES(sp)
     LOAD  x6,   6 * REGBYTES(sp)
