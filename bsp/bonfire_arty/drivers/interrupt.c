@@ -125,6 +125,15 @@ void SystemIrqHandler(uint32_t mcause,uint32_t mepc, uint32_t mstatus, struct rt
 }
 
 
+
+RT_WEAK void BonfireHandleTrap(trapframe_t * t)
+{
+   BOARD_DEBUG("Trap Exception %lx\n",t->cause);
+   dump_tf(t);
+   rt_hw_cpu_shutdown();
+
+}
+
 void SystemTrapHandler(uint32_t mcause,uint32_t mepc, uint32_t mstatus, struct rt_hw_stack_frame *f)
 {
 trapframe_t t;
@@ -136,7 +145,7 @@ trapframe_t t;
     t.insn = *((uint32_t*)mepc);
     t.gpr[0]=0;
     t.gpr[1]=f->ra;
-    t.gpr[2]=(uint32_t)f;
+    t.gpr[2]=(uint32_t)f+sizeof(struct rt_hw_stack_frame);
     t.badvaddr=read_csr(mbadaddr);
 
     // copy x3..x31
@@ -144,8 +153,14 @@ trapframe_t t;
     for(int i=3;i<32;i++) {
       t.gpr[i]=*sr++; 
     }
+    BonfireHandleTrap(&t);
+    f->epc=t.epc;
+    f->mstatus=t.status;
+    f->ra=t.gpr[1];
+    sr = (uint32_t*)&f->gp;
+    for(int i=3;i<32;i++) {
+      *sr++=t.gpr[i]; 
+    }
 
-    BOARD_DEBUG("Trap Exception %lx at %lx\n",mcause,mepc); 
-    dump_tf(&t);
-    rt_hw_cpu_shutdown();
+      
 }

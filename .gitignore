@@ -52,3 +52,5 @@ cmake-build-debug
 *.mk
 rt-thread-x.code-workspace
 *.lst
+libcpu/risc-v/common/cpuport.s
+rt-thread.code-workspace

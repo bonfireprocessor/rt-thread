@@ -1,0 +1,14 @@
+Import('RTT_ROOT')
+Import('rtconfig')
+from building import *
+
+cwd = os.path.join(str(Dir('#')), 'gdb-stub')
+
+
+src = Glob("*.c")
+
+CPPPATH = [cwd]
+
+group = DefineGroup('gdb-stub', src, depend = [''], CPPPATH = CPPPATH)
+
+Return('group')
