@@ -7,7 +7,7 @@
 			"path": "../Bonfire_rt_thread_nano_test"
 		},
 		{
-			"path": "../../.platformio/packages/framework-bonfire-sdk"
+			"path": "../bonfire/bonfire-software/gdb-stub"
 		}
 	]
 }

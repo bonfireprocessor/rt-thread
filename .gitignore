@@ -44,3 +44,5 @@ tags
 CMakeLists.txt
 cmake-build-debug
 *.lst
+libcpu/risc-v/common/cpuport.s
+rt-thread.code-workspace
