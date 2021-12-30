@@ -12,7 +12,7 @@
 #include "cpuport.h"
 
   .section      .text.entry
-  .align 2
+  .align 4
   .global IRQ_Handler
 IRQ_Handler:
 
@@ -20,7 +20,7 @@ IRQ_Handler:
     addi sp, sp, -32 * REGBYTES
 
     STORE x1,   1 * REGBYTES(sp) 
-    STORE x3,   3 * REGBYTES(sp)
+    STORE x3,   3 * REGBYTES(sp) // save gp so that is available in debugger
     STORE x4,   4 * REGBYTES(sp)
     STORE x5,   5 * REGBYTES(sp)
     STORE x6,   6 * REGBYTES(sp)
@@ -53,16 +53,16 @@ IRQ_Handler:
     li    t0,   0x80
     STORE t0,   2 * REGBYTES(sp)
 
-    move  s0, sp
+    move  s0, sp 
 
-    /* switch to interrupt stack */
-    la    sp, _stacktop
+    
     csrr s3, mcause
     // Check if interrupt or trap 
     bltz s3, handle_interrupt
 
 
 /* Handle Trap */  
+    la sp, _trapstack
     csrr  a0, mcause
     csrr  a1, mepc
     csrr  a2, mstatus
@@ -79,6 +79,7 @@ IRQ_Handler:
     j restore // restore registers and mret 
 
   handle_interrupt:
+    la    sp, _irqstack
     /* interrupt handler */
     call  rt_interrupt_enter
     csrr  a0, mcause
@@ -122,7 +123,7 @@ spurious_interrupt:
     csrs  mstatus, t0 
 
 restore:
-    LOAD  x3,   3 * REGBYTES(sp)
+    // LOAD  x3,   3 * REGBYTES(sp) // dont restore gp !
     LOAD  x4,   4 * REGBYTES(sp)
     LOAD  x5,   5 * REGBYTES(sp)
     LOAD  x6,   6 * REGBYTES(sp)

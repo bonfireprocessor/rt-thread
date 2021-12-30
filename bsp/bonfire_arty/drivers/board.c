@@ -46,10 +46,11 @@ RT_WEAK void *rt_heap_end_get(void)
 
 void rt_hw_cpu_shutdown()
 {
-     clear_csr(mie,MIP_MTIP); // Disable Timer Interrupt
+     write_csr(mie,0); // Disable all interrupts
      rt_hw_interrupt_disable();
 
-     void (*sram_base)() = (void*)SRAM_BASE;
+     // Jump to Firmware
+     void (*sram_base)() = (void*)SRAM_BASE; 
      sram_base();
 }
 
