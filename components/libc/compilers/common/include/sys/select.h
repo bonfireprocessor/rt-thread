@@ -40,7 +40,7 @@ typedef long    fd_mask;
 #define   NFDBITS (sizeof (fd_mask) * NBBY)   /* bits per mask */
 #ifndef   howmany
 #define   howmany(x,y)    (((x)+((y)-1))/(y))
-#endif
+#endif /* howmany */
 
 typedef struct _types_fd_set {
     fd_mask fds_bits[howmany(FD_SETSIZE, NFDBITS)];
