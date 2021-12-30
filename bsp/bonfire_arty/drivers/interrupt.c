@@ -117,7 +117,7 @@ void SystemIrqHandler(uint32_t mcause,uint32_t mepc, uint32_t mstatus, struct rt
        case 0x07:
          //BOARD_DEBUG("Timer irq @%ld\n",pmtime[0]);
          pmtime[2]=pmtime[0]+tick_interval;  // Will as side effect clear the pending irq
-          rt_tick_increase();
+         rt_tick_increase();
          break;
       default:
         BOARD_DEBUG("Unexpeced interupt %lx\n",mcause);    
