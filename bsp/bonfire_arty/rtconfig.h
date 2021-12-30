@@ -19,16 +19,12 @@
 #define IDLE_THREAD_STACK_SIZE 256
 #define RT_USING_TIMER_SOFT
 #define RT_TIMER_THREAD_PRIO 4
-#define RT_TIMER_THREAD_STACK_SIZE 512
+#define RT_TIMER_THREAD_STACK_SIZE 2048
 
 /* kservice optimization */
 
 #define RT_DEBUG
 #define RT_DEBUG_COLOR
-#define RT_DEBUG_INIT_CONFIG
-#define RT_DEBUG_INIT 1
-#define RT_DEBUG_MEMHEAP_CONFIG
-#define RT_DEBUG_MEMHEAP 1
 
 /* Inter-Thread communication */
 

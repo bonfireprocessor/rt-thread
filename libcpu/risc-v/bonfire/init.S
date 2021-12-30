@@ -51,7 +51,7 @@ _bonfire_init:
   li x30, 0
   li x31, 0
 
-  la sp, _stacktop -1024 // Leave room for interrupt stack
+  la sp, _stacktop 
 
 
   la a1, IRQ_Handler

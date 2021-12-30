@@ -38,8 +38,8 @@ static void  messageTimerCallBack()
 char msg[80];
 static int count=0;
 
-    rt_kprintf("in messageTimerCallBack\n");
-    snprintf(msg,sizeof(msg),"Timer message %d",count++);
+    rt_kprintf("in messageTimerCallBack\n");    
+    rt_snprintf(msg,sizeof(msg),"Timer message %d",count++);
     sendMessage(msg);
 }
 
@@ -76,9 +76,12 @@ static volatile rt_uint32_t *crash;
           break;
        case 't':
           if (!timer) {
-            timer=rt_timer_create("tim01",messageTimerCallBack,NULL,10000,RT_TIMER_FLAG_PERIODIC|RT_TIMER_FLAG_SOFT_TIMER);
+            int timeout;
+            if (argc<3 || sscanf(argv[2],"%d",&timeout)!=1) timeout=10000;
+            
+            timer=rt_timer_create("tim01",messageTimerCallBack,NULL,rt_tick_from_millisecond(timeout),RT_TIMER_FLAG_PERIODIC|RT_TIMER_FLAG_SOFT_TIMER);
             RT_ASSERT(timer);
-            rt_kprintf("Timer %lx created\n",timer);
+            rt_kprintf("Timer %lx created %d ms\n",timer,timeout);
             rt_timer_start(timer);           
           } else {  
             rt_timer_delete(timer);
@@ -132,7 +135,7 @@ char * message;
   while (1) {
     //t_kprintf("thread %s\n",rt_thread_self()->name);
     //rt_thread_mdelay(1000);
-    rt_err_t err=rt_mb_recv(mb,(rt_ubase_t *)&message,10000);
+    rt_err_t err=rt_mb_recv(mb,(rt_ubase_t *)&message,RT_WAITING_FOREVER);
     if (err==RT_EOK) {
       rt_kprintf("thread %s received message: %s\n",rt_thread_self()->name,message);
       free(message);
