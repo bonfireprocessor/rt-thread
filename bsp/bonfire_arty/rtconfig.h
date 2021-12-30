@@ -84,7 +84,6 @@
 
 /* POSIX layer and C standard library */
 
-#define RT_LIBC_USING_TIME
 #define RT_LIBC_DEFAULT_TIMEZONE 8
 
 /* POSIX (Portable Operating System Interface) layer */
