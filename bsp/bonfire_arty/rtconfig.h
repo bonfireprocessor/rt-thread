@@ -24,6 +24,8 @@
 
 #define RT_DEBUG
 #define RT_DEBUG_COLOR
+#define RT_DEBUG_INIT_CONFIG
+#define RT_DEBUG_INIT 1
 
 /* Inter-Thread communication */
 
@@ -42,9 +44,10 @@
 
 /* Kernel Device Object */
 
+#define RT_USING_DEVICE
 #define RT_USING_CONSOLE
 #define RT_CONSOLEBUF_SIZE 128
-#define RT_CONSOLE_DEVICE_NAME "console"
+#define RT_CONSOLE_DEVICE_NAME "uart0"
 #define RT_VER_NUM 0x40100
 
 /* RT-Thread Components */
@@ -78,6 +81,10 @@
 
 /* Device Drivers */
 
+#define RT_USING_DEVICE_IPC
+#define RT_USING_SERIAL
+#define RT_USING_SERIAL_V1
+#define RT_SERIAL_RB_BUFSZ 64
 
 /* Using USB */
 
