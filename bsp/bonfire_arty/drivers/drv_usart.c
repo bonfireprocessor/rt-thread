@@ -16,7 +16,13 @@
 #include <rtdevice.h>
 #include "bonfire.h"
 
+#if defined(RT_USING_DEVICE) && defined(RT_USING_SERIAL)
+#pragma message "Compling drv_usart.c"
+
+#include <stddef.h>
 #include <rtdevice.h>
+#include "bonfire.h"
+
 #include "uart.h"
 #include "interrupt.h"
 #include "board.h"
