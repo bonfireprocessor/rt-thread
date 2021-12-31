@@ -3,7 +3,7 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  *
- 
+
  */
 
 #include <rthw.h>
@@ -14,7 +14,7 @@
 #include "console.h"
 
 
-// Copy from cpuport.c 
+// Copy from cpuport.c
 
 struct rt_hw_stack_frame
 {
@@ -87,8 +87,56 @@ struct rt_hw_stack_frame
 };
 
 
+
+/*  interrupt handler tables */
+
+static uint32_t irq_map_table[] =
+{
+  MIP_MEIP,  // EXT_IRQ
+  UART0_INTNUM,
+  UART1_INTNUM
+};
+
+#define MAX_HANDLERS  (sizeof(irq_map_table)/sizeof(uint32_t))
+
+static struct rt_irq_desc irq_desc[MAX_HANDLERS];
+
 static volatile uint32_t *pmtime = (uint32_t*)MTIME_BASE; // Pointer to memory mapped RISC-V Timer registers
 static uint32_t tick_interval=0;
+
+// Determine bit mask for MIP/MIE registers
+uint32_t vector_tobitmask(int irq)
+{
+  RT_ASSERT(irq<MAX_HANDLERS);
+  return 1 << irq_map_table[irq];
+
+}
+
+/**
+ * This function will un-mask a interrupt.
+ * @param vector the interrupt number
+ */
+void rt_hw_interrupt_unmask(int vector)
+{
+  set_csr(mie,vector_tobitmask(vector));
+
+}
+
+/**
+ * This function will mask a interrupt.
+ * @param vector the interrupt number
+ */
+void rt_hw_interrupt_mask(int vector)
+{
+   clear_csr(mie,vector_tobitmask(vector));
+}
+
+
+rt_isr_handler_t rt_hw_interrupt_handle(rt_uint32_t vector, void *param)
+{
+    rt_kprintf("UN-handled interrupt %d occurred!!!\n", vector);
+    return RT_NULL;
+}
 
 
 uint32_t mtime_setinterval(uint32_t interval)
@@ -114,14 +162,24 @@ void SystemIrqHandler(uint32_t mcause,uint32_t mepc, uint32_t mstatus, struct rt
 {
      RT_ASSERT(mcause & 0x80000000);
      switch (mcause & 0x0ff) {
-       case 0x07:
+        case 0x07:
          //BOARD_DEBUG("Timer irq @%ld\n",pmtime[0]);
-         pmtime[2]=pmtime[0]+tick_interval;  // Will as side effect clear the pending irq
-         rt_tick_increase();
-         break;
+          pmtime[2]=pmtime[0]+tick_interval;  // Will as side effect clear the pending irq
+          rt_tick_increase();
+          break;
+        case 0x0b: // EXT IRQ
+          irq_desc[0].handler(0,irq_desc[0].param);
+          break;
+        case UART0_INTNUM:
+          //rt_kprintf("UART0 Irq");
+          irq_desc[1].handler(1, irq_desc[1].param);
+          break;
+        case UART1_INTNUM:
+          irq_desc[2].handler(2,irq_desc[2].param);
+          break;
       default:
-        BOARD_DEBUG("Unexpeced interupt %lx\n",mcause);    
-     }  
+        BOARD_DEBUG("Unexpeced interupt %lx\n",mcause);
+     }
 }
 
 
@@ -151,7 +209,7 @@ trapframe_t t;
     // copy x3..x31
     uint32_t *sr = (uint32_t*)&f->gp;
     for(int i=3;i<32;i++) {
-      t.gpr[i]=*sr++; 
+      t.gpr[i]=*sr++;
     }
     BonfireHandleTrap(&t);
     f->epc=t.epc;
@@ -159,8 +217,58 @@ trapframe_t t;
     f->ra=t.gpr[1];
     sr = (uint32_t*)&f->gp;
     for(int i=3;i<32;i++) {
-      *sr++=t.gpr[i]; 
+      *sr++=t.gpr[i];
     }
 
-      
+
 }
+
+
+void rt_hw_interrupt_init(void)
+{
+    int idx;
+
+    rt_kprintf("rt_hw_interrupt_init\n");
+    /* init exceptions table */
+    for (idx = 0; idx < MAX_HANDLERS; idx++)
+    {
+        rt_hw_interrupt_mask(idx);
+        irq_desc[idx].handler = (rt_isr_handler_t)rt_hw_interrupt_handle;
+        irq_desc[idx].param = RT_NULL;
+#ifdef RT_USING_INTERRUPT_INFO
+        rt_snprintf(irq_desc[idx].name, RT_NAME_MAX - 1, "default");
+        irq_desc[idx].counter = 0;
+#endif
+    }// enable machine external interrupt
+}
+
+/**
+ * This function will install a interrupt service routine to a interrupt.
+ * @param vector the interrupt number
+ * @param handler the interrupt service routine to be installed
+ * @param param the interrupt service function parameter
+ * @param name the interrupt name
+ * @return old handler
+ */
+rt_isr_handler_t rt_hw_interrupt_install(int vector, rt_isr_handler_t handler,
+        void *param, const char *name)
+{
+    rt_isr_handler_t old_handler = RT_NULL;
+
+    if(vector < MAX_HANDLERS)
+    {
+        old_handler = irq_desc[vector].handler;
+        if (handler != RT_NULL)
+        {
+            irq_desc[vector].handler = (rt_isr_handler_t)handler;
+            irq_desc[vector].param = param;
+#ifdef RT_USING_INTERRUPT_INFO
+            rt_snprintf(irq_desc[vector].name, RT_NAME_MAX - 1, "%s", name);
+            irq_desc[vector].counter = 0;
+#endif
+        }
+    }
+
+    return old_handler;
+}
+
