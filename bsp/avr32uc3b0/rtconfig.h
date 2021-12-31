@@ -25,6 +25,8 @@
 
 #define RT_DEBUG
 #define RT_DEBUG_COLOR
+#define RT_DEBUG_INIT_CONFIG
+#define RT_DEBUG_INIT 1
 
 /* Inter-Thread communication */
 
@@ -43,6 +45,7 @@
 
 /* Kernel Device Object */
 
+#define RT_USING_DEVICE
 #define RT_USING_CONSOLE
 #define RT_CONSOLEBUF_SIZE 128
 #define RT_CONSOLE_DEVICE_NAME "uart"

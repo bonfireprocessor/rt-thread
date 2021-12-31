@@ -7,24 +7,63 @@
  * Date           Author       Notes
  */
 
-#if defined(RT_USING_DEVICE) && defined(RT_USING_SERIAL) 
+#include <rthw.h>
+#include <rtthread.h>
 
+#if defined(RT_USING_DEVICE) && defined(RT_USING_SERIAL)
+#pragma message "Compling drv_usart.c"
+
+#include <stddef.h>
 #include <rtdevice.h>
-#include "uart.h"
+#include "bonfire.h"
 
-// static void usart_handler(int vector, void *param)
-// {
-//     rt_hw_serial_isr((struct rt_serial_device *)param, RT_SERIAL_EVENT_RX_IND);
-// }
+#include "uart.h"
+#include "interrupt.h"
+
+
+#define UART0_VECTOR 1
+
+#define NUM_UART 1 // temporarly
+
+uint32_t* get_uart_base(unsigned id) {
+
+  if (id>NUM_UART-1) return 0;
+  switch(id) {
+    case 0:
+      return (uint32_t*)UART0_BASE;
+    case 1:
+      return (uint32_t*)UART1_BASE;
+    default:
+     return 0;
+  }
+}
+
+static void usart_handler(int vector, void *param)
+{
+    if (vector==1) {
+       volatile uint32_t *uart_adr = get_uart_base(0);
+       RT_ASSERT(uart_adr!=NULL);
+
+       uart_adr[UART_INT_REGISTER] = (1<<BIT_RX_INT_PENDING)| (1<< BIT_RX_INT_ENABLE);
+       rt_hw_serial_isr((struct rt_serial_device *)param, RT_SERIAL_EVENT_RX_IND);
+    }
+}
 
 static rt_err_t usart_configure(struct rt_serial_device *serial,
                                 struct serial_configure *cfg)
 {
+volatile uint32_t *uart_adr = get_uart_base(0);
+
+
     rt_kprintf("usart_configure\n");
+    RT_ASSERT(uart_adr!=RT_NULL);
     RT_ASSERT(serial != RT_NULL);
     RT_ASSERT(cfg != RT_NULL);
-    uart_setBaudRate(cfg->baud_rate);
-    
+    //uart_setBaudRate(cfg->baud_rate);
+    uart_adr[UART_EXT_CONTROL]= 0x030000L |  (uint16_t)(SYSCLK / cfg->baud_rate -1);
+    uart_adr[UART_INT_REGISTER] = 1<< BIT_RX_INT_ENABLE;
+
+
     return RT_EOK;
 }
 
@@ -46,14 +85,25 @@ static rt_err_t usart_control(struct rt_serial_device *serial,
 
 static int usart_putc(struct rt_serial_device *serial, char c)
 {
-    uart_writechar(c);
+volatile uint32_t *uartadr=get_uart_base(0);
+
+    RT_ASSERT(uartadr!=NULL);
+    while (!(uartadr[UART_STATUS] & 0x2)); // Wait until transmitter ready
+    uartadr[UART_TXRX]=(uint32_t)(c & 0x0ff);
     return 0;
 }
 
+
 static int usart_getc(struct rt_serial_device *serial)
 {
-     rt_kprintf("usart_getc\n");
-    return uart_wait_receive(0);
+volatile uint32_t *uartadr=get_uart_base(0);
+
+    RT_ASSERT(uartadr!=RT_NULL);
+    uint32_t status=uartadr[UART_STATUS];
+    if  (status & 0x01) // receive buffer not empty?
+       return uartadr[UART_TXRX];
+    else
+       return -1;
 }
 
 static struct rt_uart_ops ops =
@@ -78,24 +128,27 @@ static struct rt_serial_device serial =
 
 int rt_hw_uart_init(void)
 {
-  
+
+    rt_kprintf("rt_hw_uart_init\n");
+   
     rt_hw_serial_register(
         &serial,
         RT_CONSOLE_DEVICE_NAME,
         RT_DEVICE_FLAG_STREAM
-        | RT_DEVICE_FLAG_RDWR,  //  | RT_DEVICE_FLAG_INT_RX
+        | RT_DEVICE_FLAG_RDWR|RT_DEVICE_FLAG_INT_RX,
          RT_NULL);
 
-    // rt_hw_interrupt_install(
-    //     INT_UART0_BASE,
-    //     usart_handler,
-    //     (void *) & (serial.parent),
-    //     "uart interrupt");
+    rt_hw_interrupt_install(
+        UART0_VECTOR, // UART0 Vector
+        usart_handler,
+        (void *) & (serial.parent),
+        "uart0 interrupt");
 
-    //rt_hw_interrupt_unmask(INT_UART0_BASE);
+    rt_hw_interrupt_unmask(UART0_VECTOR);
 
     return 0;
 }
+
 INIT_BOARD_EXPORT(rt_hw_uart_init);
 
 #endif
