@@ -8,8 +8,6 @@
 #define UART_EXT_CONTROL 2
 #define UART_INT_REGISTER 3
 
-
-
 #define BIT_RX_INT_ENABLE 0
 #define BIT_RX_INT_PENDING 16
 

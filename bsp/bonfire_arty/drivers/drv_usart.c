@@ -10,20 +10,21 @@
 #include <rthw.h>
 #include <rtthread.h>
 
-#if defined(RT_USING_DEVICE) && defined(RT_USING_SERIAL)
-#pragma message "Compling drv_usart.c"
-
 #include <stddef.h>
 #include <rtdevice.h>
 #include "bonfire.h"
 
 #include "uart.h"
 #include "interrupt.h"
+#include "board.h"
 
+#if defined(RT_USING_DEVICE) && defined(RT_USING_SERIAL)
 
 #define UART0_VECTOR 1
 
 #define NUM_UART 1 // temporarly
+
+#define PENDING_MASK ((1<<BIT_RX_INT_PENDING)|(1<<BIT_TX_INT_PENDING)|(1<<BIT_FIFO_INT_PENDING))
 
 uint32_t* get_uart_base(unsigned id) {
 
@@ -43,9 +44,16 @@ static void usart_handler(int vector, void *param)
     if (vector==1) {
        volatile uint32_t *uart_adr = get_uart_base(0);
        RT_ASSERT(uart_adr!=NULL);
+       // Only call isr when there is really something in UART fifo 
+       // otherwise the serial handler can crash when there is a spurious interrupt without actual data.
+       uint32_t status=uart_adr[UART_STATUS];
+       if  (status & 0x01) 
+             rt_hw_serial_isr((struct rt_serial_device *)param, RT_SERIAL_EVENT_RX_IND);
+        else
+          BOARD_DEBUG("spurious UART-RX irq\n");       
 
+       // Clear pending flag and keep RX IRQ enabled 
        uart_adr[UART_INT_REGISTER] = (1<<BIT_RX_INT_PENDING)| (1<< BIT_RX_INT_ENABLE);
-       rt_hw_serial_isr((struct rt_serial_device *)param, RT_SERIAL_EVENT_RX_IND);
     }
 }
 
@@ -54,14 +62,12 @@ static rt_err_t usart_configure(struct rt_serial_device *serial,
 {
 volatile uint32_t *uart_adr = get_uart_base(0);
 
-
-    rt_kprintf("usart_configure\n");
     RT_ASSERT(uart_adr!=RT_NULL);
     RT_ASSERT(serial != RT_NULL);
     RT_ASSERT(cfg != RT_NULL);
-    //uart_setBaudRate(cfg->baud_rate);
     uart_adr[UART_EXT_CONTROL]= 0x030000L |  (uint16_t)(SYSCLK / cfg->baud_rate -1);
-    uart_adr[UART_INT_REGISTER] = 1<< BIT_RX_INT_ENABLE;
+    uart_adr[UART_INT_REGISTER] = PENDING_MASK; // clear all pending interrupts and disable interrupts
+    
 
 
     return RT_EOK;
@@ -70,14 +76,18 @@ volatile uint32_t *uart_adr = get_uart_base(0);
 static rt_err_t usart_control(struct rt_serial_device *serial,
                               int cmd, void *arg)
 {
+    volatile uint32_t *uart_adr = get_uart_base(0);
     RT_ASSERT(serial != RT_NULL);
-    rt_kprintf("usart_control\n");
     switch (cmd)
     {
-    case RT_DEVICE_CTRL_CLR_INT:
-        break;
-    case RT_DEVICE_CTRL_SET_INT:
-        break;
+        case RT_DEVICE_CTRL_CLR_INT:
+            uart_adr[UART_INT_REGISTER] = PENDING_MASK;
+            rt_hw_interrupt_mask(UART0_VECTOR);
+            break;
+        case RT_DEVICE_CTRL_SET_INT:
+            uart_adr[UART_INT_REGISTER] = PENDING_MASK | 1<< BIT_RX_INT_ENABLE;
+            rt_hw_interrupt_unmask(UART0_VECTOR);
+            break;
     }
 
     return RT_EOK;
@@ -96,13 +106,14 @@ volatile uint32_t *uartadr=get_uart_base(0);
 
 static int usart_getc(struct rt_serial_device *serial)
 {
-volatile uint32_t *uartadr=get_uart_base(0);
+volatile uint32_t *uart_adr=get_uart_base(0);
 
-    RT_ASSERT(uartadr!=RT_NULL);
-    uint32_t status=uartadr[UART_STATUS];
-    if  (status & 0x01) // receive buffer not empty?
-       return uartadr[UART_TXRX];
-    else
+
+    RT_ASSERT(uart_adr!=RT_NULL);
+    uint32_t status=uart_adr[UART_STATUS];
+    if  (status & 0x01) { // receive buffer not empty?
+       return uart_adr[UART_TXRX];      
+    } else
        return -1;
 }
 
@@ -129,8 +140,6 @@ static struct rt_serial_device serial =
 int rt_hw_uart_init(void)
 {
 
-    rt_kprintf("rt_hw_uart_init\n");
-   
     rt_hw_serial_register(
         &serial,
         RT_CONSOLE_DEVICE_NAME,
@@ -144,7 +153,6 @@ int rt_hw_uart_init(void)
         (void *) & (serial.parent),
         "uart0 interrupt");
 
-    rt_hw_interrupt_unmask(UART0_VECTOR);
 
     return 0;
 }
