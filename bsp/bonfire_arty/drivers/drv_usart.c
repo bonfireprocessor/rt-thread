@@ -1,10 +1,12 @@
 /*
  * Copyright (c) 2006-2021, RT-Thread Development Team
+ * Copyright (c) 2021,2022 Bonfire Project, Thomas Hornschuh
  *
  * SPDX-License-Identifier: Apache-2.0
  *
  * Change Logs:
  * Date           Author       Notes
+ * 01.01.2022     Thomas Hornschuh initial version
  */
 
 #include <rthw.h>
@@ -112,7 +114,7 @@ volatile uint32_t *uart_adr=get_uart_base(0);
     RT_ASSERT(uart_adr!=RT_NULL);
     uint32_t status=uart_adr[UART_STATUS];
     if  (status & 0x01) { // receive buffer not empty?
-       return uart_adr[UART_TXRX];      
+       return uart_adr[UART_TXRX] & 0xff;      
     } else
        return -1;
 }
