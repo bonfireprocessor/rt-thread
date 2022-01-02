@@ -16,7 +16,7 @@
 #include <string.h>
 #include "spi_msd.h"
 
-//#define MSD_TRACE
+#define MSD_TRACE
 
 #ifdef MSD_TRACE
     #define MSD_DEBUG(...)         rt_kprintf("[MSD] %d ", rt_tick_get()); rt_kprintf(__VA_ARGS__);
