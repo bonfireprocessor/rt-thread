@@ -40,6 +40,8 @@
 
 #define RT_USING_MEMPOOL
 #define RT_USING_SMALL_MEM
+#define RT_USING_MEMHEAP
+#define RT_MEMHEAP_FAST_MODE
 #define RT_USING_SMALL_MEM_AS_HEAP
 #define RT_USING_HEAP
 
@@ -90,6 +92,7 @@
 
 /* POSIX (Portable Operating System Interface) layer */
 
+#define RT_USING_POSIX_FS
 
 /* Interprocess Communication (IPC) */
 

@@ -93,7 +93,7 @@ void __libc_init_array(void)
 
 /* Reentrant versions of system calls.  */
 
-#ifdef RT_USING_LIBC // TH: Ported from old version 
+//#ifdef RT_USING_LIBC // TH: Ported from old version 
 #ifndef _REENT_ONLY
 int *__errno(void)
 {
@@ -325,7 +325,7 @@ _ssize_t _write_r(struct _reent *ptr, int fd, const void *buf, size_t nbytes)
 #endif /* DFS_USING_POSIX */
 }
 
-#endif /* RT_USING_LIBC  */  // TH...
+//#endif /* RT_USING_LIBC  */  // TH...
 
 /* for exit() and abort() */
 __attribute__ ((noreturn)) void _exit (int status)

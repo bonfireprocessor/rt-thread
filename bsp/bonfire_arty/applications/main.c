@@ -45,6 +45,7 @@ static int count=0;
 
 #ifdef RT_USING_FINSH
 
+
 static void test(int argc,char **argv)
 {
  
@@ -71,6 +72,16 @@ static volatile rt_uint32_t *crash;
             rt_kprintf("Current thread id %lx name: %s\n",t,t->name);
           }
           break;   
+       case 'f':
+         {
+           FILE * f=fopen("/test.txt","w+");
+           if (f) {
+             fprintf(f,"This is a file content\n");
+             fclose(f);
+           } else {
+             rt_kprintf("fopen failed\n");
+           }
+         }   
        case 's':          
           sendMessage(argc>=3?argv[2]:"default message");
           break;
