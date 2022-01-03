@@ -74,14 +74,15 @@ static volatile rt_uint32_t *crash;
           break;   
        case 'f':
          {
-           FILE * f=fopen("/test.txt","w+");
+           FILE * f=fopen(argc>=3?argv[2]:"/ram/test.txt","w+");
            if (f) {
-             fprintf(f,"This is a file content\n");
+             fprintf(f,argc>=4?argv[3]:"This is a file content\n");
              fclose(f);
            } else {
              rt_kprintf("fopen failed\n");
            }
          }   
+         break;
        case 's':          
           sendMessage(argc>=3?argv[2]:"default message");
           break;
