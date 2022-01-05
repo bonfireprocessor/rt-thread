@@ -74,8 +74,9 @@ IRQ_Handler:
     /* clear switch interrupt flag */
     sw    zero, 0(s0)
 
-    csrr  a0, mepc
-    STORE a0, 0 * REGBYTES(sp)
+    // moved  - see above 
+    //csrr  a0, mepc
+    //STORE a0, 0 * REGBYTES(sp)
 
     la    s0, rt_interrupt_from_thread
     LOAD  s1, 0(s0)
