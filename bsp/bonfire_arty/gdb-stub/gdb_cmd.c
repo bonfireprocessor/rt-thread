@@ -3,11 +3,20 @@
 #include "rtthread.h"
 #include "shell.h"
 #include "console.h"
+#include "board.h"
+
+
+static rt_bool_t debugger_flag = RT_FALSE;
 
 void BonfireHandleTrap(trapframe_t * t)
 {
-  
-   handle_exception(t);
+   if (debugger_flag)
+      handle_exception(t);
+   else {
+      BOARD_DEBUG("Trap Exception %lx\n",t->cause);
+      dump_tf(t);
+      rt_hw_cpu_shutdown();
+   }  
 }
 
 static void gdbstub(int argc, char** argv)
@@ -15,15 +24,24 @@ static void gdbstub(int argc, char** argv)
   if (argc>=2) {
      switch (argv[1][0]) {
        case 'i':
-          gdb_setup_interface(500000);
-          rt_kprintf("Start gdb on serial port\n");
-          gdb_breakpoint();
+          if (!debugger_flag) {
+             gdb_setup_interface(500000);
+             debugger_flag = RT_TRUE;
+             rt_kprintf("Start gdb on serial port\n");
+             gdb_breakpoint();
+          }
+         
           break;
        case 'd':
-          gdb_breakpoint();
-          break;     
+          if (!debugger_flag)
+             gdb_breakpoint();
+          else
+             rt_kprintf("gdbserver not initalized, use gdbserver i first\n");   
+          break;
+       case 'x':
+         debugger_flag = RT_FALSE;        
      }
   }    
 }
 
-MSH_CMD_EXPORT(gdbstub, start integrated gdbserver);
+MSH_CMD_EXPORT(gdbstub, gdbstub i d or x :  init /break/exit );
