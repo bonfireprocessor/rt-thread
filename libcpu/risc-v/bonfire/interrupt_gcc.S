@@ -53,6 +53,10 @@ IRQ_Handler:
     li    t0,   0x80
     STORE t0,   2 * REGBYTES(sp)
 
+    // save mepc here, because it may be overwritten by debug trap handler 
+    csrr  a0, mepc
+    STORE a0, 0 * REGBYTES(sp)
+
     move  s0, sp 
 
     
@@ -62,11 +66,11 @@ IRQ_Handler:
 
 
 /* Handle Trap */  
+   
     la sp, _trapstack
     csrr  a0, mcause
     csrr  a1, mepc
     csrr  a2, mstatus
-    STORE a2,   2 * REGBYTES(sp) // Write "orginal" mstatus to stackframe
     mv    a3, s0 // Stackframe from interrupted thread
     call  SystemTrapHandler
     move sp, s0
@@ -99,8 +103,9 @@ IRQ_Handler:
     /* clear switch interrupt flag */
     sw    zero, 0(s0)
 
-    csrr  a0, mepc
-    STORE a0, 0 * REGBYTES(sp)
+    // moved  - see above 
+    //csrr  a0, mepc
+    //STORE a0, 0 * REGBYTES(sp)
 
     la    s0, rt_interrupt_from_thread
     LOAD  s1, 0(s0)

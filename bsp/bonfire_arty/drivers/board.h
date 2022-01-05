@@ -23,6 +23,6 @@
 //#define BOOT_DEBUG
 
 uint32_t mtime_setinterval(uint32_t interval);
-
+void rt_hw_cpu_shutdown();
 
 #endif
