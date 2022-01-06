@@ -2,12 +2,13 @@
 	"folders": [
 		{
 			"path": "."
-		},
-		{
-			"path": "../Bonfire_rt_thread_nano_test"
-		},
-		{
-			"path": "../bonfire/bonfire-software/gdb-stub"
 		}
-	]
+	],
+	"settings": {
+		"files.associations": {
+			"*.include": "makefile",
+			"*.core": "yaml",
+			"uart.h": "c"
+		}
+	}
 }
