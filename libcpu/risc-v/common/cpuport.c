@@ -110,7 +110,8 @@ rt_uint8_t *rt_hw_stack_init(void       *tentry,
     int                i;
 
     stk  = stack_addr + sizeof(rt_ubase_t);
-    stk  = (rt_uint8_t *)RT_ALIGN_DOWN((rt_ubase_t)stk, REGBYTES);
+    stk  = (rt_uint8_t *)RT_ALIGN_DOWN((rt_ubase_t)stk, 16);
+    //rt_kprintf("sp: %x\n",stk);
     stk -= sizeof(struct rt_hw_stack_frame);
 
     frame = (struct rt_hw_stack_frame *)stk;
