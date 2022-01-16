@@ -19,21 +19,26 @@ void BonfireHandleTrap(trapframe_t * t)
    }  
 }
 
+void gdbstub_init_debug()
+{
+  if (!debugger_flag) {
+       gdb_setup_interface(500000);
+       debugger_flag = RT_TRUE;
+       rt_kprintf("Start gdb on serial port\n");
+       gdb_breakpoint();
+   }
+}
+
 static void gdbstub(int argc, char** argv)
 {
   if (argc>=2) {
      switch (argv[1][0]) {
        case 'i':
-          if (!debugger_flag) {
-             gdb_setup_interface(500000);
-             debugger_flag = RT_TRUE;
-             rt_kprintf("Start gdb on serial port\n");
-             gdb_breakpoint();
-          }
-         
+        
+          gdbstub_init_debug();
           break;
        case 'd':
-          if (!debugger_flag)
+          if (debugger_flag)
              gdb_breakpoint();
           else
              rt_kprintf("gdbserver not initalized, use gdbserver i first\n");   
@@ -43,5 +48,7 @@ static void gdbstub(int argc, char** argv)
      }
   }    
 }
+
+
 
 MSH_CMD_EXPORT(gdbstub, gdbstub i d or x :  init /break/exit );
