@@ -20,7 +20,7 @@
 #define BOARD_DEBUG(...)
 #endif
 
-//#define BOOT_DEBUG
+#define BOOT_DEBUG
 
 uint32_t mtime_setinterval(uint32_t interval);
 void rt_hw_cpu_shutdown();

@@ -92,7 +92,7 @@ struct rt_hw_stack_frame
 
 static uint32_t irq_map_table[] =
 {
-  MIP_MEIP,  // EXT_IRQ
+  IRQ_M_EXT,  // EXT_IRQ
   UART0_INTNUM,
   UART1_INTNUM
 };

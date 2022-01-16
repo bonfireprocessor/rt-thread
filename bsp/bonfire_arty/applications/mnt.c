@@ -62,9 +62,9 @@ int mnt_init(void)
 		return 0;
 
 	if (dfs_mount(RT_NULL,romfs_mounted==RT_EOK?"/ram":"/", "ram", 0, (const void *)dfs_ramfs_create(pool, size)) == 0)
-		rt_kprintf("RAM file system initializated!\n");
+		rt_kprintf("\nRAM file system initializated!\n");
 	else
-		rt_kprintf("RAM file system initializate failed!\n");
+		rt_kprintf("\nRAM file system initializate failed!\n");
 
 	return 0;
 #endif	
