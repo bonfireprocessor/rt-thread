@@ -69,15 +69,17 @@ static void assert_handler(const char *ex_string, const char *func, rt_size_t li
 void rt_hw_board_init(void)
 {
 #ifdef BOOT_DEBUG    
-     gdb_setup_interface(500000);
-     rt_kprintf("Start gdb on serial port\n");
-     gdb_breakpoint();
+     gdbstub_init_debug();
 #endif
 
     rt_assert_set_hook(assert_handler);
     mtime_setinterval( ((long)(SYSCLK/RT_TICK_PER_SECOND)));
     rt_hw_interrupt_init();
      //rt_hw_uart_init();
+     
+#if defined(RT_USING_USER_MAIN) && defined(RT_USING_HEAP)
+    rt_system_heap_init(rt_heap_begin_get(), rt_heap_end_get());
+#endif     
 
     /* Call components board initial (use INIT_BOARD_EXPORT()) */
 #ifdef RT_USING_COMPONENTS_INIT
@@ -86,9 +88,7 @@ void rt_hw_board_init(void)
    
 #endif
 
-#if defined(RT_USING_USER_MAIN) && defined(RT_USING_HEAP)
-    rt_system_heap_init(rt_heap_begin_get(), rt_heap_end_get());
-#endif
+
 
 #if defined(RT_USING_CONSOLE) && defined(RT_USING_DEVICE)
     BOARD_DEBUG("Calling rt_console_set_device with %s\n",RT_CONSOLE_DEVICE_NAME);
