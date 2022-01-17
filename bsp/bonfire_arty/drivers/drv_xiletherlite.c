@@ -36,8 +36,8 @@
 #define MAX_ADDR_LEN 6
 
 // Supress Debug Output
-// #undef BOARD_DEBUG
-// #define BOARD_DEBUG(...) 
+#undef BOARD_DEBUG
+#define BOARD_DEBUG(...) 
 
 struct xe_net_device
 {
@@ -45,9 +45,7 @@ struct xe_net_device
     struct eth_device parent;
 
     /* interface address info. */
-    rt_uint8_t  dev_addr[MAX_ADDR_LEN]; /* hw address   */
-
-   
+    rt_uint8_t  dev_addr[MAX_ADDR_LEN]; /* hw address   */  
 };
 
 static struct xe_net_device eth0 = {
@@ -133,30 +131,33 @@ uint32_t *pdest = dest;
 
 size_t szwords =(size % 4)?size/4+1:size/4; // round up
 int i;
-static uint32_t aligned_buffer[ETH_BUFSIZE_WORDS];
     
     RT_ASSERT(szwords<=ETH_BUFSIZE_WORDS);
-    if (((uintptr_t)src) % 4) { // src not word aligned 
-        memcpy((void*)aligned_buffer,src,size);
-        psrc = aligned_buffer;
-    } 
+    RT_ASSERT((uintptr_t)src % 4 ==0); // Check alignment
+    
     for(i=0;i<szwords;i++)
        pdest[i]=psrc[i];
 }
 
 static rt_err_t xe_tx(rt_device_t dev, struct pbuf *p)
 {
-    //struct net_device *xe = (struct net_device *)dev;
+static uint32_t aligned_buffer[ETH_BUFSIZE_WORDS];
 
    rt_base_t level=rt_hw_interrupt_disable(); 
+   RT_ASSERT(p); 
+   RT_ASSERT(p->tot_len<=ETH_BUFSIZE_WORDS*4);
+   void *dest = (void *)aligned_buffer;
+   for (struct pbuf *q=p; q != RT_NULL; q = q->next) {
+       memcpy(dest,q->payload,q->len);
+       dest+= q->len;
+   }
 
-   while (_read_word(ETHL_TX_PING_CTRL) & 0x01); // Wait until buffer ready
-   RT_ASSERT(p->len==p->tot_len); // TODO: Check if tx will always be one unfragmented buffer 
-   eth_copy_buffer(ETHL_TX_PING_BUFF,p->payload,p->tot_len);
+   while (_read_word(ETHL_TX_PING_CTRL) & 0x01); // Wait until buffer ready 
+   eth_copy_buffer(ETHL_TX_PING_BUFF,(void*)aligned_buffer,p->tot_len);
    _write_word(ETHL_TX_PING_LEN,p->tot_len);
    _write_word(ETHL_TX_PING_CTRL,0x01); // Start send
 
-    rt_hw_interrupt_enable(level);
+   rt_hw_interrupt_enable(level);
 
    return RT_EOK;
 
@@ -166,7 +167,6 @@ static rt_err_t xe_tx(rt_device_t dev, struct pbuf *p)
 static  inline rt_uint16_t get_nbo_word(uintptr_t buff,int offset )
 {
   rt_uint8_t *b = (rt_uint8_t*)buff;
-
   return b[offset+1] | (b[offset] << 8);
 }
 
@@ -235,17 +235,12 @@ struct pbuf *p = RT_NULL;
          }
     }
     
-  
     _write_word((void*)currentBuff+ETHL_OFFSET_CTRL,0x8); // clear buffer, enable interrupts
     
      currentBuff ^= PONG_BUFF_OFFSET;
   }
   rt_hw_interrupt_enable(level); 
-  if (p && p->payload) {
-         BOARD_DEBUG("First 16 Bytes of pbuf Frame:\n");
-         for(int i=0;i<16;i++) BOARD_DEBUG("%x ",((uint8_t*)p->payload)[i]);
-         BOARD_DEBUG("\n");
-  } 
+ 
   return p;
 }
 
@@ -307,13 +302,6 @@ static int  rt_hw_xe_init()
     return 0;
 }
 
-//INIT_BOARD_EXPORT(rt_hw_xe_init);
-
-#include "finsh.h"
-
-
-
-MSH_CMD_EXPORT_ALIAS(rt_hw_xe_init,ethinit,ethinit);
-
+INIT_ENV_EXPORT(rt_hw_xe_init);
 
 #endif
