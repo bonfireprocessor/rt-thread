@@ -159,18 +159,17 @@ int finsh_getchar(void)
         return -1; /* EOF */
     }
 #else
-    rt_device_t device;
+    //rt_device_t device; // TH
 
     RT_ASSERT(shell != RT_NULL);
 
-    device = shell->device;
-    if (device == RT_NULL)
+    //device = shell->device; // TH
+    if (shell->device == RT_NULL) // TH
     {
         return -1; /* EOF */
     }
 
-    while (rt_device_read(device, -1, &ch, 1) != 1)
-    {
+    while (rt_device_read(shell->device, -1, &ch, 1) != 1) // TH
         rt_sem_take(&shell->rx_sem, RT_WAITING_FOREVER);
         if (shell->device != device)
         {
