@@ -416,6 +416,8 @@ hexToInt(char **ptr, int *intValue)
 // For detection of nested calls....
 static volatile int semaphore =0;
 
+static uint32_t mstatus_save;
+
 /*
  * This function does all command procesing for interfacing to gdb.
  */
@@ -436,7 +438,12 @@ static trapframe_t*  prepare_return(trapframe_t *ptf,int flagSingleStep)
   catch_mem_err=0;
   PRINTK("prepare_return to: %08lx\n",ptf->epc);
 
-  if (flagSingleStep)  set_csr(0x7c0,MBONFIRE_SSTEP); // Set Single Step Mode
+  if (flagSingleStep) { 
+    set_csr(0x7c0,MBONFIRE_SSTEP); // Set Single Step Mode
+    mstatus_save = ptf->status;
+    ptf->status &= ~MSTATUS_MPIE; // Disable Interrupts in Single step mode
+
+  }
   return ptf;
 }
 
@@ -462,7 +469,12 @@ trapframe_t* handle_exception (trapframe_t *ptf)
 
   semaphore=1; // currently dont use semaphore...
 
-  clear_csr(0x7C0,MBONFIRE_SSTEP); // clear Single Step Mode
+  if (read_csr(0x7C0) & 0x1) { // Single step mode was active
+     clear_csr(0x7C0,MBONFIRE_SSTEP); // clear Single Step Mode
+     ptf->status = mstatus_save; // Restore old mstatus 
+  }
+ 
+
 
   //dump_tf(ptf);
   PRINTK("Trap %lx\n",ptf->cause);
