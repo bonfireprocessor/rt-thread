@@ -6,7 +6,7 @@
 
 /* RT-Thread Kernel */
 
-#define RT_NAME_MAX 8
+#define RT_NAME_MAX 12
 #define RT_ALIGN_SIZE 4
 #define RT_THREAD_PRIORITY_32
 #define RT_THREAD_PRIORITY_MAX 32
@@ -105,7 +105,7 @@
 
 /* C/C++ and POSIX layer */
 
-#define RT_LIBC_DEFAULT_TIMEZONE 8
+#define RT_LIBC_DEFAULT_TIMEZONE 1
 
 /* POSIX (Portable Operating System Interface) layer */
 
@@ -180,6 +180,8 @@
 
 /* Utilities */
 
+#define RT_USING_RYM
+#define YMODEM_USING_FILE_TRANSFER
 
 /* RT-Thread Utestcases */
 
@@ -196,6 +198,21 @@
 
 /* Wiced WiFi */
 
+#define PKG_USING_NETUTILS
+#define PKG_NETUTILS_TFTP
+#define PKG_NETUTILS_IPERF
+#define PKG_NETUTILS_NTP
+#define NTP_USING_AUTO_SYNC
+#define NTP_AUTO_SYNC_FIRST_DELAY 30
+#define NTP_AUTO_SYNC_PERIOD 3600
+#define NETUTILS_NTP_HOSTNAME "192.168.26.2"
+#define NETUTILS_NTP_HOSTNAME2 "de.pool.ntp.org"
+#define NETUTILS_NTP_HOSTNAME3 ""
+#define PKG_NETUTILS_TELNET
+#define PKG_NETUTILS_TCPDUMP
+#define PKG_NETUTILS_TCPDUMP_DBG
+#define PKG_USING_NETUTILS_LATEST_VERSION
+#define PKG_NETUTILS_VER_NUM 0x99999
 
 /* IoT Cloud */
 
