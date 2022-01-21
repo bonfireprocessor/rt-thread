@@ -8,7 +8,10 @@
 		"files.associations": {
 			"*.include": "makefile",
 			"*.core": "yaml",
-			"uart.h": "c"
+			"uart.h": "c",
+			"ethernetif.h": "c",
+			"socket.h": "c",
+			"sockets.h": "c"
 		}
 	}
 }
