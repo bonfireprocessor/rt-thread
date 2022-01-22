@@ -82,6 +82,7 @@
 //Bonfire specific Defines / Coding
 
 #include "bonfire.h"
+#include "interrupt.h"
 
 
 //#define DEBUG
@@ -444,6 +445,7 @@ static trapframe_t*  prepare_return(trapframe_t *ptf,int flagSingleStep)
     ptf->status &= ~MSTATUS_MPIE; // Disable Interrupts in Single step mode
 
   }
+  rt_hw_increase_mtime(); // Skip tick interrupt do avoid timeouts during debugging 
   return ptf;
 }
 
@@ -467,7 +469,7 @@ trapframe_t* handle_exception (trapframe_t *ptf)
       //return ptf;
   //}
 
-  semaphore=1; // currently dont use semaphore...
+  semaphore=1; // currently dont  semaphore id not used...
 
   if (read_csr(0x7C0) & 0x1) { // Single step mode was active
      clear_csr(0x7C0,MBONFIRE_SSTEP); // clear Single Step Mode
