@@ -12,6 +12,7 @@
 
 #include <rthw.h>
 
+void rt_hw_increase_mtime();
 
 void rt_hw_interrupt_mask(int irq);
 void rt_hw_interrupt_unmask(int irq);

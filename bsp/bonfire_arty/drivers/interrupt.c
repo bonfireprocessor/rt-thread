@@ -156,6 +156,10 @@ uint32_t mtime_setinterval(uint32_t interval)
    return tick_interval;
 }
 
+void rt_hw_increase_mtime()
+{
+  pmtime[2]=pmtime[0]+tick_interval;  // Will as side effect clear the pending irq
+}
 
 void SystemIrqHandler(uint32_t mcause,uint32_t mepc, uint32_t mstatus, struct rt_hw_stack_frame *f)
 {
