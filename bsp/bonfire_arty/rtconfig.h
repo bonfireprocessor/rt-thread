@@ -86,7 +86,7 @@
 #define DFS_USING_WORKDIR
 #define DFS_FILESYSTEMS_MAX 4
 #define DFS_FILESYSTEM_TYPES_MAX 4
-#define DFS_FD_MAX 16
+#define DFS_FD_MAX 256
 #define RT_USING_DFS_ELMFAT
 
 /* elm-chan's FatFs, Generic FAT Filesystem Module */
@@ -132,7 +132,6 @@
 #define RT_USING_POSIX_FS
 #define RT_USING_POSIX_POLL
 #define RT_USING_POSIX_SELECT
-#define RT_USING_POSIX_AIO
 
 /* Interprocess Communication (IPC) */
 
@@ -256,6 +255,8 @@
 
 /* language packages */
 
+#define PKG_USING_ELUART
+#define PKG_USING_ELUART_LATEST_VERSION
 
 /* multimedia packages */
 
@@ -274,6 +275,9 @@
 /* system packages */
 
 /* enhanced kernel services */
+
+
+/* POSIX extension functions */
 
 
 /* acceleration: Assembly language or algorithmic acceleration packages */
