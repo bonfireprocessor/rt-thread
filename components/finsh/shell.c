@@ -150,6 +150,7 @@ int finsh_getchar(void)
 #ifdef RT_USING_DEVICE
     char ch = 0;
 #ifdef RT_USING_POSIX_STDIO
+#pragma message "finsh is using POSIX-I/O !!!!"
     if(read(STDIN_FILENO, &ch, 1) > 0)
     {
         return ch;

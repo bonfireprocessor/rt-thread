@@ -52,3 +52,4 @@ libcpu/risc-v/common/cpuport.s
 rt-thread.code-workspace
 libcpu/risc-v/common/cpuport.s
 rt-thread.code-workspace
+~packages/eluart
