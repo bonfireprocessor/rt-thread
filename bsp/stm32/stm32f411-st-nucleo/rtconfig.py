@@ -17,7 +17,7 @@ if os.getenv('RTT_ROOT'):
 # EXEC_PATH is the compiler execute path, for example, CodeSourcery, Keil MDK, IAR
 if  CROSS_TOOL == 'gcc':
     PLATFORM    = 'gcc'
-    EXEC_PATH   = r'C:\Users\XXYYZZ'
+    EXEC_PATH   = r'/usr/bin'
 elif CROSS_TOOL == 'keil':
     PLATFORM    = 'armcc'
     EXEC_PATH   = r'C:/Keil_v5'
@@ -59,7 +59,7 @@ if PLATFORM == 'gcc':
 
     CXXFLAGS = CFLAGS 
 
-    POST_ACTION = OBJCPY + ' -O binary $TARGET rtthread.bin\n' + SIZE + ' $TARGET \n'
+    POST_ACTION = OBJCPY + ' -O binary $TARGET rtthread.bin\n' + SIZE + ' $TARGET \n' + "st-flash --reset write rtthread.bin 0x8000000\n"
 
 elif PLATFORM == 'armcc':
     # toolchains
@@ -174,7 +174,7 @@ elif PLATFORM == 'iar':
     CXXFLAGS = CFLAGS
 
     EXEC_PATH = EXEC_PATH + '/arm/bin/'
-    POST_ACTION = 'ielftool --bin $TARGET rtthread.bin'
+    POST_ACTION = 'ielftool --bin $TARGET rtthread.bin;  st-flash --reset write rtthread.bin 0x8000000'
 
 def dist_handle(BSP_ROOT, dist_dir):
     import sys
