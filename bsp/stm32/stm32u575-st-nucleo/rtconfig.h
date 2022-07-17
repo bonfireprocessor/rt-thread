@@ -37,6 +37,8 @@
 
 #define RT_USING_MEMPOOL
 #define RT_USING_SMALL_MEM
+#define RT_USING_MEMHEAP
+#define RT_MEMHEAP_FAST_MODE
 #define RT_USING_SMALL_MEM_AS_HEAP
 #define RT_USING_HEAP
 
@@ -82,6 +84,8 @@
 #define DFS_FILESYSTEMS_MAX 4
 #define DFS_FILESYSTEM_TYPES_MAX 4
 #define DFS_FD_MAX 16
+#define RT_USING_DFS_ROMFS
+#define RT_USING_DFS_RAMFS
 
 /* Device Drivers */
 
@@ -91,11 +95,9 @@
 #define RT_SERIAL_RB_BUFSZ 64
 #define RT_USING_CPUTIME
 #define RT_USING_PIN
+#define RT_USING_RTC
+#define RT_USING_SOFT_RTC
 #define RT_USING_SPI
-#define RT_USING_HWCRYPTO
-#define RT_HWCRYPTO_DEFAULT_NAME "hwcryto"
-#define RT_HWCRYPTO_IV_MAX_SIZE 16
-#define RT_HWCRYPTO_KEYBIT_MAX_SIZE 256
 
 /* Using USB */
 
@@ -105,13 +107,9 @@
 #define USB_VENDOR_ID 0x0FFE
 #define USB_PRODUCT_ID 0x0001
 #define RT_USB_DEVICE_COMPOSITE
-#define RT_USB_DEVICE_CDC
 #define RT_USB_DEVICE_NONE
-#define RT_VCOM_TASK_STK_SIZE 512
-#define RT_CDC_RX_BUFSIZE 128
-#define RT_VCOM_SERNO "32021919830108"
-#define RT_VCOM_SER_LEN 14
-#define RT_VCOM_TX_TIMEOUT 1000
+#define RT_USB_DEVICE_MSTORAGE
+#define RT_USB_MSTORAGE_DISK_NAME "flash0"
 
 /* POSIX layer and C standard library */
 
@@ -230,7 +228,9 @@
 #define BSP_USING_UART1
 #define BSP_USING_SPI
 #define BSP_USING_SPI1
-#define BSP_USING_UDID
+#define BSP_SCB_ENABLE_I_CACHE
+#define BSP_USING_USBD
+#define BSP_USBD_TYPE_FS
 
 /* Board extended module Drivers */
 

@@ -44,6 +44,19 @@ menu "On-chip Peripheral Drivers"
            
         endif
 
+    config BSP_SCB_ENABLE_I_CACHE
+        bool "Enable I Cache"
+        default y
+        select RT_SCB_ENABLE_I_CACHE
+
+    config BSP_USING_USBD
+        bool "Enable USB Device Mode"
+        default n 
+        select RT_USING_STM_USBD 
+        select BSP_USBD_TYPE_FS
+
+
+
 
 
     source "../libraries/HAL_Drivers/Kconfig"
