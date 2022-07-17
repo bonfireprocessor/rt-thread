@@ -2,16 +2,28 @@
 	"folders": [
 		{
 			"path": "."
+		},
+		{
+			"path": "../../.env"
+		},
+		{
+			"path": "../eluart_examples"
 		}
 	],
 	"settings": {
 		"files.associations": {
-			"*.include": "makefile",
 			"*.core": "yaml",
+			"*.include": "makefile",
 			"uart.h": "c",
 			"ethernetif.h": "c",
 			"socket.h": "c",
-			"sockets.h": "c"
+			"sockets.h": "c",
+			"string.h": "c",
+			"rtdevice.h": "c",
+			"phy.h": "c",
+			"lua2rtt.h": "c",
+			"drv_spi.h": "c",
+			"drv_common.h": "c"
 		}
 	}
 }

@@ -59,3 +59,18 @@ void SystemClock_Config(void)
     while(1);
   }
 }
+
+void SCB_EnableICache()
+{
+   if (HAL_ICACHE_ConfigAssociativityMode(ICACHE_1WAY) != HAL_OK)
+  {
+    /* Initialization Error */
+     while(1);
+  }
+  if (HAL_ICACHE_Enable() != HAL_OK)
+  {
+     /* Initialization Error */
+     while(1);
+  }
+}
+

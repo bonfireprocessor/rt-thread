@@ -12,6 +12,7 @@
 #include <rtthread.h>
 
 #ifdef BSP_USING_USBD
+#pragma message "Compiling drv_usbd.c"
 #include <rtdevice.h>
 #include "board.h"
 #include <string.h>
