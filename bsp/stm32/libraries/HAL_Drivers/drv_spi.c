@@ -426,6 +426,11 @@ static int rt_hw_spi_bus_init(void)
         spi_bus_obj[i].spi_bus.parent.user_data = &spi_config[i];
         spi_bus_obj[i].handle.Instance = spi_config[i].Instance;
 
+#if defined(SOC_SERIES_STM32U5)        // Added TH, STN32U5 currently no DMA support
+ #pragma message "SPI DMA skipped for STM32U5"
+
+ #else 
+
         if (spi_bus_obj[i].spi_dma_flag & SPI_USING_RX_DMA_FLAG)
         {
             /* Configure the DMA handler for Transmission process */
@@ -509,6 +514,9 @@ static int rt_hw_spi_bus_init(void)
                 UNUSED(tmpreg); /* To avoid compiler warnings */
             }
         }
+
+
+#endif
 
         result = rt_spi_bus_register(&spi_bus_obj[i].spi_bus, spi_config[i].bus_name, &stm_spi_ops);
         RT_ASSERT(result == RT_EOK);
