@@ -16,3 +16,5 @@ for item in list:
         group = group + SConscript(os.path.join(item, 'SConscript'))
 
 Return('group')
+
+

@@ -35,6 +35,8 @@
 
 #define RT_USING_MEMPOOL
 #define RT_USING_SMALL_MEM
+#define RT_USING_MEMHEAP
+#define RT_MEMHEAP_FAST_MODE
 #define RT_USING_SMALL_MEM_AS_HEAP
 #define RT_USING_HEAP
 
@@ -78,6 +80,8 @@
 #define DFS_FILESYSTEMS_MAX 4
 #define DFS_FILESYSTEM_TYPES_MAX 4
 #define DFS_FD_MAX 16
+#define RT_USING_DFS_ROMFS
+#define RT_USING_DFS_RAMFS
 
 /* Device Drivers */
 
@@ -87,9 +91,19 @@
 #define RT_SERIAL_RB_BUFSZ 64
 #define RT_USING_PIN
 #define RT_USING_RTC
+#define RT_USING_SPI
 
 /* Using USB */
 
+#define RT_USING_USB
+#define RT_USING_USB_DEVICE
+#define RT_USBD_THREAD_STACK_SZ 4096
+#define USB_VENDOR_ID 0x0FFE
+#define USB_PRODUCT_ID 0x0001
+#define RT_USB_DEVICE_COMPOSITE
+#define RT_USB_DEVICE_NONE
+#define RT_USB_DEVICE_MSTORAGE
+#define RT_USB_MSTORAGE_DISK_NAME "flash0"
 
 /* C/C++ and POSIX layer */
 
@@ -208,8 +222,14 @@
 #define BSP_USING_GPIO
 #define BSP_USING_UART
 #define BSP_USING_UART2
+#define BSP_USING_SPI
+#define BSP_USING_SPI1
+#define BSP_SPI1_TX_USING_DMA
+#define BSP_SPI1_RX_USING_DMA
 #define BSP_USING_ONCHIP_RTC
 #define BSP_RTC_USING_LSE
+#define BSP_USING_USBD
+#define BSP_USBD_TYPE_FS
 
 /* Board extended module Drivers */
 
