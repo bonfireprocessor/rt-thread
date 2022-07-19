@@ -8,6 +8,10 @@
 		},
 		{
 			"path": "../eluart_examples"
+		
+		},
+		{
+			"path": "../lua"
 		}
 	],
 	"settings": {
