@@ -254,8 +254,6 @@
 
 /* language packages */
 
-#define PKG_USING_ELUART
-#define PKG_USING_ELUART_LATEST_VERSION
 
 /* multimedia packages */
 

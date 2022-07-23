@@ -1434,7 +1434,7 @@ ufunction_t rt_usbd_function_rndis_create(udevice_t device)
     _rndis->parent.eth_tx               = rt_rndis_eth_tx;
 
     /* register eth device */
-    eth_device_init(&((rt_rndis_eth_t)cdc->user_data)->parent, "u0");
+    eth_device_init(&((rt_rndis_eth_t)cdc->user_data)->parent, "u1");
 
 #endif /* RT_USING_LWIP */
 
