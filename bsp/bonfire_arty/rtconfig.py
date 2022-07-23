@@ -10,13 +10,14 @@ if os.getenv('RTT_CC'):
 
 if  CROSS_TOOL == 'gcc':
     PLATFORM    = 'gcc'
-    EXEC_PATH   = r'/home/thomas/opt/riscv/bin'
+    
 else:
     print('Please make sure your toolchains is GNU GCC!')
     exit(0)
 
-if os.getenv('RTT_EXEC_PATH'):
-    EXEC_PATH = os.getenv('RTT_EXEC_PATH')
+if os.getenv('RTT_EXEC_PATH_RISCV'):    
+    EXEC_PATH = os.getenv('RTT_EXEC_PATH_RISCV')
+    print("set gcc EXEC_PATH: "+EXEC_PATH)
 
 BUILD = 'debug'
 #BUILD = 'release'
