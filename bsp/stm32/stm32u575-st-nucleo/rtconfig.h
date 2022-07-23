@@ -17,6 +17,9 @@
 #define RT_USING_IDLE_HOOK
 #define RT_IDLE_HOOK_LIST_SIZE 4
 #define IDLE_THREAD_STACK_SIZE 256
+#define RT_USING_TIMER_SOFT
+#define RT_TIMER_THREAD_PRIO 4
+#define RT_TIMER_THREAD_STACK_SIZE 512
 
 /* kservice optimization */
 
@@ -84,6 +87,7 @@
 #define DFS_FILESYSTEMS_MAX 4
 #define DFS_FILESYSTEM_TYPES_MAX 4
 #define DFS_FD_MAX 16
+#define RT_USING_DFS_DEVFS
 #define RT_USING_DFS_ROMFS
 #define RT_USING_DFS_RAMFS
 
@@ -107,13 +111,8 @@
 #define USB_VENDOR_ID 0x0FFE
 #define USB_PRODUCT_ID 0x0001
 #define RT_USB_DEVICE_COMPOSITE
-#define RT_USB_DEVICE_CDC
 #define RT_USB_DEVICE_NONE
-#define RT_VCOM_TASK_STK_SIZE 512
-#define RT_CDC_RX_BUFSIZE 128
-#define RT_VCOM_SERNO "32021919830108"
-#define RT_VCOM_SER_LEN 14
-#define RT_VCOM_TX_TIMEOUT 1000
+#define RT_USB_DEVICE_ECM
 
 /* POSIX layer and C standard library */
 
@@ -134,7 +133,13 @@
 
 /* Network interface device */
 
+#define RT_USING_NETDEV
+#define NETDEV_USING_IFCONFIG
 #define NETDEV_USING_PING
+#define NETDEV_USING_NETSTAT
+#define NETDEV_USING_AUTO_DEFAULT
+#define NETDEV_IPV4 1
+#define NETDEV_IPV6 0
 
 /* light weight TCP/IP stack */
 
