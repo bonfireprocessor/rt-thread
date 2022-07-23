@@ -33,7 +33,7 @@ menu "On-chip Peripheral Drivers"
                 default n
         endif   
 
-     menuconfig BSP_USING_SPI
+    menuconfig BSP_USING_SPI
         bool "Enable SPI BUS"
         default n
         select RT_USING_SPI
@@ -49,18 +49,15 @@ menu "On-chip Peripheral Drivers"
         default y
         select RT_SCB_ENABLE_I_CACHE
 
-    menuconfig BSP_USING_USBD
+    config BSP_USING_USBD
         bool "Enable USB Device Mode"
-        default n 
+        default n        
         select RT_USING_STM_USBD 
         select BSP_USBD_TYPE_FS
-        /*
-        if RT_USB_DEVICE_MSTORAGE
-            config RT_USB_MSTORAGE_DISK_NAME
-            string "msc class disk name"
-            default "ram"
-        endif
-        */
+       
+    
+        
+    
 
 
 
