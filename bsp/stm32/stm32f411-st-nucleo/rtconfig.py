@@ -59,7 +59,7 @@ if PLATFORM == 'gcc':
 
     CXXFLAGS = CFLAGS 
 
-    POST_ACTION = OBJCPY + ' -O binary $TARGET rtthread.bin\n' + SIZE + ' $TARGET \n' # + "st-flash --reset write rtthread.bin 0x8000000\n"
+    POST_ACTION = OBJCPY + ' -O binary $TARGET rtthread.bin\n' + SIZE + ' $TARGET \n'  + "st-flash --reset write rtthread.bin 0x8000000\n"
 
 elif PLATFORM == 'armcc':
     # toolchains
@@ -174,7 +174,7 @@ elif PLATFORM == 'iccarm':
     CXXFLAGS = CFLAGS
 
     EXEC_PATH = EXEC_PATH + '/arm/bin/'
-    POST_ACTION = 'ielftool --bin $TARGET rtthread.bin' ## ; # st-flash --reset write rtthread.bin 0x8000000'
+    POST_ACTION = 'ielftool --bin $TARGET rtthread.bin ;  st-flash --reset write rtthread.bin 0x8000000'
 
 def dist_handle(BSP_ROOT, dist_dir):
     import sys

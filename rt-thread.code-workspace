@@ -31,7 +31,8 @@
 			"array": "c",
 			"string": "c",
 			"string_view": "c",
-			"select.h": "c"
+			"select.h": "c",
+			"stm32f4xx_ll_usb.h": "c"
 		}
 	}
 }

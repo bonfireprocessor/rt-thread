@@ -202,7 +202,7 @@ static rt_err_t _wakeup(void)
     return RT_EOK;
 }
 
-#if defined(SOC_SERIES_STM32U5)
+#if defined(SOC_SERIES_STM32U5) || defined(BSP_CALL_LOCAL_USB_INIT)
 extern rt_uint32_t MX_USB_OTG_FS_PCD_Init(PCD_HandleTypeDef * pcd);
 #endif
 
@@ -213,7 +213,10 @@ static rt_err_t _init(rt_device_t device)
     pcd = (PCD_HandleTypeDef *)device->user_data;
     pcd->Instance = USBD_INSTANCE;
     memset(&pcd->Init, 0, sizeof pcd->Init);
-#if !defined(SOC_SERIES_STM32U5)    
+#if defined(SOC_SERIES_STM32U5) || defined(BSP_CALL_LOCAL_USB_INIT)
+    #pragma message "drv_usbd.c calls local MX_USB_OTG_FS_PCD_Init"
+    MX_USB_OTG_FS_PCD_Init(pcd);
+#else
     pcd->Init.dev_endpoints = 8;
     pcd->Init.speed = USBD_PCD_SPEED;
     pcd->Init.ep0_mps = EP_MPS_64;
@@ -222,9 +225,6 @@ static rt_err_t _init(rt_device_t device)
 #endif
     /* Initialize LL Driver */
     HAL_PCD_Init(pcd);
-#else
-#pragma message "drv_usbd.c compile for STM32U5"
-    MX_USB_OTG_FS_PCD_Init(pcd);
 #endif
 
     /* USB interrupt Init */
