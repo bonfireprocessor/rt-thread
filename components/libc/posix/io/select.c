@@ -8,9 +8,16 @@
  * 2016-12-28     Bernard      first version
  */
 
+//#define  _GNU_SOURCE // Patch TH, to allow fd_mask to set with gcc 11
+
 #include <rtthread.h>
 #include <poll.h>
 #include <sys/select.h>
+
+#if __GNUC__==11 && __BSD_VISIBLE == 0
+#pragma message "locally define fd_mask"
+typedef __fd_mask	fd_mask;
+#endif
 
 static void fdszero(fd_set *set, int nfds)
 {
