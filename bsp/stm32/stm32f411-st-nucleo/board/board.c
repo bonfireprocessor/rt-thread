@@ -9,6 +9,8 @@
  */
 
 #include "board.h"
+#include "stm32f4xx_hal_conf.h"
+#include "stm32f4xx_ll_usb.h"
 
 void SystemClock_Config(void)
 {
@@ -54,4 +56,37 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+}
+
+
+
+void MX_USB_OTG_FS_PCD_Init( PCD_HandleTypeDef *pcd)
+{
+
+  /* USER CODE BEGIN USB_OTG_FS_Init 0 */
+
+  /* USER CODE END USB_OTG_FS_Init 0 */
+
+  /* USER CODE BEGIN USB_OTG_FS_Init 1 */
+
+  /* USER CODE END USB_OTG_FS_Init 1 */
+  pcd->Instance = USB_OTG_FS;
+  pcd->Init.dev_endpoints = 4;
+  pcd->Init.speed = PCD_SPEED_FULL;
+  pcd->Init.dma_enable = DISABLE;
+  pcd->Init.ep0_mps = EP_MPS_64;
+  pcd->Init.phy_itface = PCD_PHY_EMBEDDED;
+  pcd->Init.Sof_enable = DISABLE;
+  pcd->Init.low_power_enable = DISABLE;
+  pcd->Init.lpm_enable = DISABLE;
+  pcd->Init.vbus_sensing_enable = DISABLE;
+  pcd->Init.use_dedicated_ep1 = DISABLE;
+  if (HAL_PCD_Init(pcd) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USB_OTG_FS_Init 2 */
+
+  /* USER CODE END USB_OTG_FS_Init 2 */
+
 }

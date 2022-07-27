@@ -125,8 +125,14 @@ menu "On-chip Peripheral Drivers"
     config BSP_USING_USBD
         bool "Enable USB Device Mode"
         default n 
-        select RT_USING_STM_USBD 
+        select RT_USING_USB_DEVICE
         select BSP_USBD_TYPE_FS
+        if BSP_USING_USBD
+            config  BSP_CALL_LOCAL_USB_INIT
+            bool "Call MX_USB_OTG_FS_PCD_Init in board.c"
+            default y
+        endif    
+        
 
     source "../libraries/HAL_Drivers/Kconfig"
     
