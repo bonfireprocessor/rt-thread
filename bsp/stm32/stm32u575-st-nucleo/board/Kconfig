@@ -53,6 +53,7 @@ menu "On-chip Peripheral Drivers"
         bool "Enable USB Device Mode"
         default n        
         select RT_USING_STM_USBD 
+        select RT_USING_USB_DEVICE
         select BSP_USBD_TYPE_FS
        
     

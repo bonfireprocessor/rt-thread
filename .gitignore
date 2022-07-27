@@ -54,3 +54,4 @@ libcpu/risc-v/common/cpuport.s
 rt-thread.code-workspace
 ~packages/eluart
 bsp/raspberry-pico/rtthread-pico.uf2
+

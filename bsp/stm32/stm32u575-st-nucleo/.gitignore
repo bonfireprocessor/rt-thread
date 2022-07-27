@@ -13,7 +13,7 @@
 build
 Debug
 documentation/html
-packages/
+
 *~
 *.o
 *.obj
@@ -40,3 +40,5 @@ RTE/
 settings/
 *.uvguix*
 cconfig.h
+!packages/netutils-latest/*
+!packages/netutils-latest/telnet/**
