@@ -27,7 +27,11 @@
 			"phy.h": "c",
 			"lua2rtt.h": "c",
 			"drv_spi.h": "c",
-			"drv_common.h": "c"
+			"drv_common.h": "c",
+			"array": "c",
+			"string": "c",
+			"string_view": "c",
+			"select.h": "c"
 		}
 	}
 }

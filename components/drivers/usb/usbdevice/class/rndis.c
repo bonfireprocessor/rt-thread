@@ -24,7 +24,7 @@
 
 /* define RNDIS_DELAY_LINK_UP by menuconfig for delay linkup */
 
-#define DBG_LEVEL           DBG_WARNING
+#define DBG_LEVEL           DBG_LOG //DBG_WARNING
 #define DBG_SECTION_NAME    "RNDIS"
 #include <rtdbg.h>
 
@@ -823,6 +823,70 @@ static rt_err_t _rndis_get_encapsulated_response(ufunction_t func, ureq_t setup)
     return RT_EOK;
 }
 
+
+/**
+ * This function will handle cdc_get_line_coding request.
+ *
+ * @param device the usb device object.
+ * @param setup the setup request.
+ *
+ * @return RT_EOK on successful.
+ */
+static rt_err_t _cdc_get_line_coding(udevice_t device, ureq_t setup)
+{
+    struct ucdc_line_coding data;
+    rt_uint16_t size;
+
+    RT_ASSERT(device != RT_NULL);
+    RT_ASSERT(setup != RT_NULL);
+
+    RT_DEBUG_LOG(RT_DEBUG_USB, ("_cdc_get_line_coding\n"));
+
+    data.dwDTERate = 115200;
+    data.bCharFormat = 0;
+    data.bDataBits = 8;
+    data.bParityType = 0;
+    size = setup->wLength > 7 ? 7 : setup->wLength;
+
+    rt_usbd_ep0_write(device, (void*)&data, size);
+
+    return RT_EOK;
+}
+
+static rt_err_t _cdc_set_line_coding_callback(udevice_t device, rt_size_t size)
+{
+    RT_DEBUG_LOG(RT_DEBUG_USB, ("_cdc_set_line_coding_callback\n"));
+
+    dcd_ep0_send_status(device->dcd);
+
+    return RT_EOK;
+}
+
+/**
+ * This function will handle cdc_set_line_coding request.
+ *
+ * @param device the usb device object.
+ * @param setup the setup request.
+ *
+ * @return RT_EOK on successful.
+ */
+static rt_err_t _cdc_set_line_coding(udevice_t device, ureq_t setup)
+{
+    RT_ASSERT(device != RT_NULL);
+    RT_ASSERT(setup != RT_NULL);
+
+    rt_uint8_t linecoding[7];
+
+    RT_DEBUG_LOG(RT_DEBUG_USB, ("_cdc_set_line_coding\n"));
+
+    rt_usbd_ep0_read(device, (void*)&linecoding, sizeof(linecoding),
+        _cdc_set_line_coding_callback);
+
+    return RT_EOK;
+}
+
+
+
 /**
  * This function will handle rndis interface request.
  *
@@ -833,6 +897,7 @@ static rt_err_t _rndis_get_encapsulated_response(ufunction_t func, ureq_t setup)
  */
 static rt_err_t _interface_handler(ufunction_t func, ureq_t setup)
 {
+    //struct vcom *data;
     RT_ASSERT(func != RT_NULL);
     RT_ASSERT(setup != RT_NULL);
 
@@ -845,6 +910,19 @@ static rt_err_t _interface_handler(ufunction_t func, ureq_t setup)
     case CDC_GET_ENCAPSULATED_RESPONSE:
         _rndis_get_encapsulated_response(func, setup);
         break;
+
+    case CDC_SET_LINE_CODING:
+        _cdc_set_line_coding(func->device, setup);
+        break;
+    case CDC_GET_LINE_CODING:
+        _cdc_get_line_coding(func->device, setup);
+        break;  
+    case CDC_SET_CONTROL_LINE_STATE:
+        //data = (struct vcom*)func->user_data;
+        //data->connected = (setup->wValue & 0x01) > 0?RT_TRUE:RT_FALSE;
+        //RT_DEBUG_LOG(RT_DEBUG_USB, ("rndis state:%d \n", data->connected));
+        dcd_ep0_send_status(func->device->dcd);
+        break;      
 
     default:
         LOG_W("unkown setup->request 0x%02X !", setup->bRequest);
