@@ -79,8 +79,9 @@ void MX_USB_OTG_FS_PCD_Init( PCD_HandleTypeDef *pcd)
   pcd->Init.Sof_enable = DISABLE;
   pcd->Init.low_power_enable = DISABLE;
   pcd->Init.lpm_enable = DISABLE;
-  pcd->Init.vbus_sensing_enable = DISABLE;
+  pcd->Init.vbus_sensing_enable = ENABLE;
   pcd->Init.use_dedicated_ep1 = DISABLE;
+ // pcd->Init.use_external_vbus = DISABLE;
   if (HAL_PCD_Init(pcd) != HAL_OK)
   {
     Error_Handler();
