@@ -32,7 +32,8 @@
 			"string": "c",
 			"string_view": "c",
 			"select.h": "c",
-			"stm32f4xx_ll_usb.h": "c"
+			"stm32f4xx_ll_usb.h": "c",
+			"dfs_posix.h": "c"
 		}
 	}
 }
