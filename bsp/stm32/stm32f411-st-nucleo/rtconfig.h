@@ -17,6 +17,9 @@
 #define RT_USING_IDLE_HOOK
 #define RT_IDLE_HOOK_LIST_SIZE 4
 #define IDLE_THREAD_STACK_SIZE 256
+#define RT_USING_TIMER_SOFT
+#define RT_TIMER_THREAD_PRIO 4
+#define RT_TIMER_THREAD_STACK_SIZE 512
 
 /* kservice optimization */
 
@@ -86,6 +89,9 @@
 /* Device Drivers */
 
 #define RT_USING_DEVICE_IPC
+#define RT_USING_SYSTEM_WORKQUEUE
+#define RT_SYSTEM_WORKQUEUE_STACKSIZE 2048
+#define RT_SYSTEM_WORKQUEUE_PRIORITY 23
 #define RT_USING_SERIAL
 #define RT_USING_SERIAL_V1
 #define RT_SERIAL_RB_BUFSZ 64
@@ -111,6 +117,8 @@
 /* POSIX (Portable Operating System Interface) layer */
 
 #define RT_USING_POSIX_FS
+#define RT_USING_POSIX_POLL
+#define RT_USING_POSIX_SELECT
 
 /* Interprocess Communication (IPC) */
 
@@ -121,6 +129,13 @@
 
 /* Socket abstraction layer */
 
+#define RT_USING_SAL
+#define SAL_INTERNET_CHECK
+
+/* protocol stack implement */
+
+#define SAL_USING_LWIP
+#define SAL_USING_POSIX
 
 /* Network interface device */
 
@@ -225,6 +240,12 @@
 
 /* tools packages */
 
+#define PKG_USING_DHRYSTONE
+#define DHRY_ITERS 320000
+
+/* You may ajust this number to make sure the benchmark runs long enough */
+
+#define PKG_USING_DHRYSTONE_LATEST_VERSION
 
 /* system packages */
 
@@ -259,14 +280,13 @@
 /* entertainment: terminal games and other interesting software packages */
 
 
-/* Privated Packages of RealThread */
+/* RT-Thread local packages */
 
-
-/* Network Utilities */
-
-
-/* RT-Thread Smart */
-
+#define PKG_USING_NETUTILS
+#define PKG_NETUTILS_TFTP
+#define PKG_NETUTILS_TELNET
+#define PKG_USING_NETUTILS_LOCAL_VERSION
+#define PKG_NETUTILS_VER_NUM 0x99999
 #define SOC_FAMILY_STM32
 #define SOC_SERIES_STM32F4
 
