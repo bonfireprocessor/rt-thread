@@ -3,10 +3,12 @@
  */
 
 /* Program Entry, set to mark it as "used" and avoid gc */
+/* Memories definition */
 MEMORY
 {
-    ROM (rx) : ORIGIN = 0x08000000, LENGTH = 512k /* 512KB flash */
-    RAM (rw) : ORIGIN = 0x20000000, LENGTH =  96k  /* 96KB sram */
+  RAM	(xrw)	: ORIGIN = 0x20000000,	LENGTH = 768K
+  SRAM4	(xrw)	: ORIGIN = 0x28000000,	LENGTH = 16K
+  ROM	(rx)	: ORIGIN = 0x08000000,	LENGTH = 2048K
 }
 ENTRY(Reset_Handler)
 _system_stack_size = 0x400;
