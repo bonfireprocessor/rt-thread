@@ -59,6 +59,7 @@
 #define RT_USING_USER_MAIN
 #define RT_MAIN_THREAD_STACK_SIZE 2048
 #define RT_MAIN_THREAD_PRIORITY 10
+#define RT_USING_LEGACY
 
 /* C++ features */
 
@@ -225,11 +226,6 @@
 
 /* Wiced WiFi */
 
-#define PKG_USING_NETUTILS
-#define PKG_NETUTILS_TFTP
-#define PKG_NETUTILS_TELNET
-#define PKG_USING_NETUTILS_LATEST_VERSION
-#define PKG_NETUTILS_VER_NUM 0x99999
 
 /* IoT Cloud */
 
@@ -253,6 +249,19 @@
 
 /* tools packages */
 
+#define PKG_USING_COREMARK
+#define COREMARK_ITERATIONS 3600
+
+/* You may ajust this number to make sure the benchmark runs for at least 10s */
+
+#define PKG_USING_COREMARK_LATEST_VERSION
+#define CORE_MARK_HAS_FLOAT 0
+#define PKG_USING_DHRYSTONE
+#define DHRY_ITERS 320000
+
+/* You may ajust this number to make sure the benchmark runs long enough */
+
+#define PKG_USING_DHRYSTONE_LATEST_VERSION
 
 /* system packages */
 
@@ -284,6 +293,14 @@
 
 /* entertainment: terminal games and other interesting software packages */
 
+
+/* RT-Thread local packages */
+
+#define PKG_USING_NETUTILS
+#define PKG_NETUTILS_TFTP
+#define PKG_NETUTILS_TELNET
+#define PKG_USING_NETUTILS_LATEST_VERSION
+#define PKG_NETUTILS_VER_NUM 0x99999
 #define SOC_FAMILY_STM32
 #define SOC_SERIES_STM32U5
 
@@ -295,6 +312,7 @@
 
 /* On-chip Peripheral Drivers */
 
+#define BSP_USING_ON_CHIP_FLASH
 #define BSP_USING_GPIO
 #define BSP_USING_UART
 #define BSP_USING_UART1

@@ -254,6 +254,13 @@
 
 /* tools packages */
 
+#define PKG_USING_COREMARK
+#define COREMARK_ITERATIONS 3600
+
+/* You may ajust this number to make sure the benchmark runs for at least 10s */
+
+#define PKG_USING_COREMARK_LATEST_VERSION
+#define CORE_MARK_HAS_FLOAT 0
 #define PKG_USING_DHRYSTONE
 #define DHRY_ITERS 320000
 
