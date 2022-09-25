@@ -82,7 +82,7 @@ int stm_flash_test(int argc, char** argv)
 {
 
 
-  rt_kprintf("Flash Bank size %ld\n",FLASH_BANK_SIZE);
+  rt_kprintf("Flash Bank size %ld\nFlash Page Size %ld\n",FLASH_BANK_SIZE,FLASH_PAGE_SIZE);
  
 
   /* Disable instruction cache prior to internal cacheable memory update */
