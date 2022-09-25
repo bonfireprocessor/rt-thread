@@ -1,9 +1,12 @@
 from building import *
 
 cwd     = GetCurrentDir()
+print("cwd")
 src     = Glob('*.c')
 CPPPATH = [str(Dir('#')), cwd]
 
 group = DefineGroup('Applications', src, depend = [''], CPPPATH = CPPPATH)
+
+group += SConscript(os.path.join(cwd,'littlefs','SConscript'))
 
 Return('group')
