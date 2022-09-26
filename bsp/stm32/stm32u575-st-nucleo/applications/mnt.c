@@ -17,6 +17,7 @@
 
 #include "dfs_romfs.h"
 
+
 const static struct romfs_dirent _dummy[] =
 {
 //    {ROMFS_DIRENT_FILE, "dummy.txt", _dummy_dummy_txt, sizeof(_dummy_dummy_txt)},
@@ -30,7 +31,8 @@ const static struct romfs_dirent _dummy[] =
 RT_WEAK const struct romfs_dirent _root_dirent[] =
 {
     {ROMFS_DIRENT_DIR, "sd", (rt_uint8_t *)_dummy, 0},//  sizeof(_dummy) / sizeof(_dummy[0])},
-	{ROMFS_DIRENT_DIR, "ram", (rt_uint8_t *)_dummy,0} //sizeof(_dummy) / sizeof(_dummy[0])},
+	{ROMFS_DIRENT_DIR, "ram", (rt_uint8_t *)_dummy,0}, //sizeof(_dummy) / sizeof(_dummy[0])},
+	{ROMFS_DIRENT_DIR, "lfs", (rt_uint8_t *)_dummy,0}
     
 };
 
@@ -53,6 +55,9 @@ int mnt_init(void)
 #ifdef RT_USING_DFS_ROMFS
 	  romfs_mounted = dfs_mount(RT_NULL,"/","rom",0,&romfs_root);
 #endif
+
+   
+
 
 #ifdef RT_USING_DFS_RAMFS
 	rt_uint8_t *pool = RT_NULL;
