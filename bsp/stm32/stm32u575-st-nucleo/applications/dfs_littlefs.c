@@ -237,6 +237,21 @@ struct dirent *d;
     return index * sizeof(struct dirent); 
 }
 
+int dfs_lfs_unlink(struct dfs_filesystem *fs, const char *pathname)
+{
+    lfs_t *lfs = ( lfs_t *) fs->data;
+    RT_ASSERT(lfs != RT_NULL);
+    return lfs_remove(lfs,pathname);
+}
+
+
+int dfs_lfs_rename(struct dfs_filesystem *fs, const char *oldpath, const char *newpath)
+{
+    lfs_t *lfs = ( lfs_t *) fs->data;
+    RT_ASSERT(lfs != RT_NULL);
+    return lfs_rename(lfs,oldpath,newpath);
+}
+
 static const struct dfs_file_ops _lfs_fops =
 {
     dfs_lfs_open,
@@ -260,9 +275,9 @@ static const struct dfs_filesystem_ops _lfs_fs =
     NULL, /* mkfs */
     NULL, /* statfs */
 
-    NULL, /* unlink */
+    dfs_lfs_unlink, /* unlink */
     dfs_lfs_stat,
-    NULL, /* rename */
+    dfs_lfs_rename, /* rename */
 };
 
 int dfs_lfs_init(void)

@@ -20,6 +20,9 @@
 #include LFS_STRINGIZE(LFS_CONFIG)
 #else
 
+#define LFS_THREADSAFE 1
+
+
 // System includes
 #include <stdint.h>
 #include <stdbool.h>

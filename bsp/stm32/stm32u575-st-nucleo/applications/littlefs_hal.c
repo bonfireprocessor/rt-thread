@@ -20,7 +20,10 @@ lfs_file_t file;
 #define BLOCK_SIZE 8192
 
 
-static int hal_flash_read(const struct lfs_config *c, lfs_block_t block,
+struct rt_mutex lfs_mutex;
+
+
+static int lfshal_flash_read(const struct lfs_config *c, lfs_block_t block,
             lfs_off_t off, void *buffer, lfs_size_t size)
 {
 
@@ -53,14 +56,11 @@ static HAL_StatusTypeDef _flash_program_verify(rt_uint32_t dest,void* src)
 }
 
 
-static int hal_flash_prog(const struct lfs_config *c, lfs_block_t block,
+static int lfshal_flash_prog(const struct lfs_config *c, lfs_block_t block,
             lfs_off_t off, const void *buffer, lfs_size_t size)
 {
-// rt_uint32_t  copied = 0;
-// rt_uint32_t src_adr;
  HAL_StatusTypeDef res;
-// rt_uint8_t buffer[16]; // Quadword Buffer 
-rt_uint32_t next_quadword; 
+
 
     RT_ASSERT(block < NUM_BLOCKS);
     rt_uint32_t addr = block * BLOCK_SIZE + FIRST_BLOCK + off;
@@ -90,7 +90,7 @@ rt_uint32_t next_quadword;
 }
 
 
-static int hal_flash_erase(const struct lfs_config *c, lfs_block_t block)
+static int lfshal_flash_erase(const struct lfs_config *c, lfs_block_t block)
 {
 FLASH_EraseInitTypeDef EraseInitStruct;
 uint32_t PageError = 0;
@@ -125,18 +125,33 @@ uint32_t PageError = 0;
    
 }
 
-static int hal_flash_sync(const struct lfs_config *c)
+static int lfshal_flash_sync(const struct lfs_config *c)
 {
   return 0;
+}
+
+static int lfshal_flash_lock(const struct lfs_config *c)
+{
+    rt_mutex_take(&lfs_mutex,RT_WAITING_FOREVER);
+    return 0;
+}
+
+
+static int lfshal_flash_unlock(const struct lfs_config *c)
+{
+    rt_mutex_release(&lfs_mutex);
+    return 0;
 }
 
 
 const struct lfs_config cfg = {
     // block device operations
-    .read  = hal_flash_read,
-    .prog  = hal_flash_prog,
-    .erase = hal_flash_erase,
-    .sync  = hal_flash_sync,
+    .read  = lfshal_flash_read,
+    .prog  = lfshal_flash_prog,
+    .erase = lfshal_flash_erase,
+    .sync  = lfshal_flash_sync,
+    .lock  = lfshal_flash_lock,
+    .unlock = lfshal_flash_unlock,
 
     // block device configuration
     .read_size = 16,
@@ -153,6 +168,14 @@ const struct lfs_config *get_lfs_hal()
 {
    return &cfg;
 }
+
+int lfs_init()
+{
+  rt_mutex_init(&lfs_mutex,"lfs",RT_IPC_FLAG_FIFO);
+  
+}
+
+INIT_ENV_EXPORT(lfs_init);
 
 
 int lfs_start(int argc,char **argv)
