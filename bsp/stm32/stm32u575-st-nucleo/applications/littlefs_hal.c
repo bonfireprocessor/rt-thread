@@ -11,9 +11,8 @@
 
 
 
-// variables used by the filesystem
-lfs_t lfs;
-lfs_file_t file;
+
+
 
 #define FIRST_BLOCK 0x08100000
 #define NUM_BLOCKS 128
@@ -164,10 +163,10 @@ const struct lfs_config cfg = {
 };
 
 
-const struct lfs_config *get_lfs_hal()
-{
-   return &cfg;
-}
+// const struct lfs_config *get_lfs_hal()
+// {
+//    return &cfg;
+// }
 
 int lfs_init()
 {
@@ -180,6 +179,9 @@ INIT_ENV_EXPORT(lfs_init);
 
 int lfs_start(int argc,char **argv)
 {
+// variables used by the filesystem
+//static lfs_t lfs;  
+//static lfs_file_t file;  
 
     dfs_mount(RT_NULL,"/lfs","lfs",0,(const void*)&cfg);
 
