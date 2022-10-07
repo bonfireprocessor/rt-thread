@@ -16,7 +16,7 @@
 
 //#include "dfs_lfs_fs.h"
 
-int dfs_lfs_mount(struct dfs_filesystem *fs, unsigned long rwflag, const void *data)
+static int dfs_lfs_mount(struct dfs_filesystem *fs, unsigned long rwflag, const void *data)
 {
 const struct lfs_config *c = (const struct lfs_config *)data;
 
@@ -43,7 +43,7 @@ lfs_t *lfs = rt_malloc(sizeof(lfs_t));
     }    
 }
 
-int dfs_lfs_unmount(struct dfs_filesystem *fs)
+static int dfs_lfs_unmount(struct dfs_filesystem *fs)
 {
     lfs_t *lfs = ( lfs_t *) fs->data;
 
@@ -54,46 +54,68 @@ int dfs_lfs_unmount(struct dfs_filesystem *fs)
     return RT_EOK;
 }
 
-int dfs_lfs_ioctl(struct dfs_fd *file, int cmd, void *args)
+static int dfs_lfs_ioctl(struct dfs_fd *file, int cmd, void *args)
 {
     return -RT_EIO;
 }
 
-int dfs_lfs_read(struct dfs_fd *file, void *buf, rt_size_t count)
+static int dfs_lfs_read(struct dfs_fd *file, void *buf, rt_size_t count)
 {
     lfs_t *lfs = ( lfs_t *) file->fs->data; 
     RT_ASSERT(lfs!=RT_NULL);
     RT_ASSERT(file->data != RT_NULL);
-     if (file->flags & O_DIRECTORY) {
+     if (file->type == FT_DIRECTORY) {
         return  -ENOENT; // TODO Implementation
      } else {
-        return lfs_file_read(lfs,(lfs_file_t*)file->data,buf,count);
+        lfs_file_t* fd = file->data;
+        int rsize = lfs_file_read(lfs,fd,buf,count);
+        if (rsize >= 0) file->pos = fd->pos;
+        return rsize;
      }   
 }
 
 
-int   dfs_lfs_write(struct dfs_fd *file, const void *buf, size_t count)
+static int  dfs_lfs_write(struct dfs_fd *file, const void *buf, size_t count)
 {
     lfs_t *lfs = ( lfs_t *) file->fs->data; 
     RT_ASSERT(lfs!=RT_NULL);
     RT_ASSERT(file->data != RT_NULL);
-     if (file->flags & O_DIRECTORY) {
+     if (file->type == FT_DIRECTORY) {
         return  -ENOENT; // TODO Implementation
      } else {
-        return lfs_file_write(lfs,(lfs_file_t*)file->data,buf,count);
+        lfs_file_t* fd = file->data;
+        int wsize = lfs_file_write(lfs,fd,buf,count);
+        if (wsize >= 0) file->pos = fd->pos;
+        return wsize;
      }   
 }
 
-int dfs_lfs_lseek(struct dfs_fd *file, rt_off_t offset)
+static int dfs_lfs_lseek(struct dfs_fd *file, rt_off_t offset)
 {
     lfs_t *lfs = ( lfs_t *) file->fs->data; 
+    lfs_soff_t soff;
+
     RT_ASSERT(lfs!=RT_NULL);
     RT_ASSERT(file->data != RT_NULL);
-     if (file->flags & O_DIRECTORY) {
-        return  -ENOENT; // TODO Implementation
-     } else {
-        return lfs_file_seek(lfs,(lfs_file_t*)file->data,offset,0);
-     }   
+
+    if (file->type == FT_DIRECTORY) {
+        lfs_dir_t * dir = ( lfs_dir_t *) file->data;
+        soff = lfs_dir_seek(lfs,dir,offset);
+        if (soff>=0) {
+            file->pos = dir->pos;
+            return file->pos;
+        } else 
+          return soff;
+        
+    } else {
+        lfs_file_t* fd = file->data;
+        soff=lfs_file_seek(lfs,fd,offset,0);
+        if (soff>=0) {
+            file->pos = fd->pos;
+            return file->pos;
+        } else 
+          return soff;
+    }   
 }
 
 int dfs_lfs_close(struct dfs_fd *file)
@@ -103,7 +125,7 @@ lfs_t *lfs = ( lfs_t *) file->fs->data;
     RT_ASSERT(lfs!=RT_NULL);
     RT_ASSERT(file->data!=RT_NULL);
 
-    if (file->flags & O_DIRECTORY)
+    if (file->type == FT_DIRECTORY)
       lfs_dir_close(lfs,(lfs_dir_t*)file->data);
     else
       lfs_file_close(lfs,(lfs_file_t*)file->data);  
@@ -130,6 +152,8 @@ int dfs_lfs_open(struct dfs_fd *file)
                 return -ENOENT; // TODO: Better error mapping
             } else {
                 file->data = (void*) dir;
+                file->type =FT_DIRECTORY;
+                file->pos = dir->pos;
                 return RT_EOK;
             }
 
@@ -158,6 +182,9 @@ int dfs_lfs_open(struct dfs_fd *file)
         if (file->flags & O_EXCL)
             mode |= LFS_O_EXCL;
 
+         if (file->flags & O_APPEND)
+            mode |= LFS_O_APPEND;    
+
         lfs_file_t * fd = rt_malloc(sizeof(lfs_file_t));
         if (file==RT_NULL) return -ENOMEM;
         int err = lfs_file_open(lfs,fd,file->path,mode);
@@ -166,13 +193,17 @@ int dfs_lfs_open(struct dfs_fd *file)
             return err; // TODO: Map Errors
         } else {
             file->data = fd;
+            file->pos = fd->pos;
+            file->size = fd->ctz.size;
+            file->type = FT_REGULAR;
             return RT_EOK;
         }
 
     }
 }
 
-int dfs_lfs_stat(struct dfs_filesystem *fs, const char *path, struct stat *st)
+
+static int dfs_lfs_stat(struct dfs_filesystem *fs, const char *path, struct stat *st)
 {
 struct lfs_info info;
 
@@ -181,14 +212,24 @@ struct lfs_info info;
     memset(st,0,sizeof(struct stat));
     int err = lfs_stat(lfs,path,&info);
     if (err==LFS_ERR_OK) {
-        if (info.type == LFS_TYPE_DIR ) st->st_mode = S_IFDIR;
+        switch (info.type)
+        {
+            case LFS_TYPE_DIR:
+                st->st_mode |= S_IFDIR;
+                break;
+
+            case LFS_TYPE_REG:
+                st->st_mode |= S_IFREG;
+                break;
+        }
         st->st_size = info.size; 
+        st->st_mode |= S_IRWXU | S_IRWXG | S_IRWXO;
     }
 
-    return RT_EOK;
+    return err;
 }
 
-int dfs_lfs_getdents(struct dfs_fd *file, struct dirent *dirp, uint32_t count)
+static int dfs_lfs_getdents(struct dfs_fd *file, struct dirent *dirp, uint32_t count)
 {
 lfs_dir_t *dir;
 struct lfs_info info;
@@ -237,7 +278,7 @@ struct dirent *d;
     return index * sizeof(struct dirent); 
 }
 
-int dfs_lfs_unlink(struct dfs_filesystem *fs, const char *pathname)
+static int dfs_lfs_unlink(struct dfs_filesystem *fs, const char *pathname)
 {
     lfs_t *lfs = ( lfs_t *) fs->data;
     RT_ASSERT(lfs != RT_NULL);
@@ -245,7 +286,7 @@ int dfs_lfs_unlink(struct dfs_filesystem *fs, const char *pathname)
 }
 
 
-int dfs_lfs_rename(struct dfs_filesystem *fs, const char *oldpath, const char *newpath)
+static int dfs_lfs_rename(struct dfs_filesystem *fs, const char *oldpath, const char *newpath)
 {
     lfs_t *lfs = ( lfs_t *) fs->data;
     RT_ASSERT(lfs != RT_NULL);
@@ -286,6 +327,7 @@ int dfs_lfs_init(void)
     dfs_register(&_lfs_fs);
     return 0;
 }
+
 INIT_COMPONENT_EXPORT(dfs_lfs_init);
 
 
