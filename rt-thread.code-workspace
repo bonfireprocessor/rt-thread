@@ -8,10 +8,15 @@
 		},
 		{
 			"path": "../eluart_examples"
-		
 		},
 		{
 			"path": "../lua"
+		},
+		{
+			"path": "../stm32/STM32CubeU5"
+		},
+		{
+			"path": "../bonfire/bonfire-software/bonfire-boot"
 		}
 	],
 	"settings": {
@@ -33,7 +38,13 @@
 			"string_view": "c",
 			"select.h": "c",
 			"stm32f4xx_ll_usb.h": "c",
-			"dfs_posix.h": "c"
+			"dfs_posix.h": "c",
+			"stm32u5xx_hal_flash.h": "c",
+			"stm_flash.h": "c",
+			"spiffs_config.h": "c",
+			"rtthread.h": "c",
+			"dfs_ramfs.h": "c",
+			"lfs.h": "c"
 		}
 	}
 }
