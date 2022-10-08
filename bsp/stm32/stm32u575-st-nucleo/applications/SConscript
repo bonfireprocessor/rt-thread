@@ -9,6 +9,5 @@ CPPPATH = [cwd]
 
 group = DefineGroup('Applications', src, depend = [''], CPPPATH = CPPPATH)
 
-group += SConscript(os.path.join(cwd,'littlefs','SConscript'))
 
 Return('group')
