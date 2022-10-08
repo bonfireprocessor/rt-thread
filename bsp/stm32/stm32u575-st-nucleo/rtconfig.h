@@ -103,6 +103,7 @@
 #define RT_SERIAL_RB_BUFSZ 64
 #define RT_USING_CPUTIME
 #define RT_USING_PIN
+#define RT_USING_MTD_NOR
 #define RT_USING_RTC
 #define RT_USING_SOFT_RTC
 #define RT_USING_SPI
@@ -279,6 +280,15 @@
 
 /* Micrium: Micrium software products porting for RT-Thread */
 
+#define PKG_USING_LITTLEFS
+#define PKG_USING_LITTLEFS_LATEST_VERSION
+#define LFS_READ_SIZE 16
+#define LFS_PROG_SIZE 16
+#define LFS_BLOCK_SIZE 8192
+#define LFS_CACHE_SIZE 16
+#define LFS_BLOCK_CYCLES 1
+#define LFS_THREADSAFE
+#define LFS_LOOKAHEAD_MAX 16
 
 /* peripheral libraries and drivers */
 

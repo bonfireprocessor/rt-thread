@@ -66,14 +66,25 @@ int mnt_init(void)
 	if (pool == RT_NULL)
 		return 0;
 
-	if (dfs_mount(RT_NULL,romfs_mounted==RT_EOK?"/ram":"/", "ram", 0, (const void *)dfs_ramfs_create(pool, size)) == 0)
+	if (dfs_mount(RT_NULL,romfs_mounted==RT_EOK?"/ram":"/", "ram", 0, (const void *)dfs_ramfs_create(pool, size)) == RT_EOK)
 		rt_kprintf("\nRAM file system initializated!\n");
 	else
 		rt_kprintf("\nRAM file system initializate failed!\n");
 
-	return 0;
-#endif	
+	
+#endif
+
+#if (defined(RT_USING_MTD_NOR) && defined(PKG_USING_LITTLEFS))
+#pragma message "Compiling lfs mount"
+	if (romfs_mounted==RT_EOK &&  dfs_mount("stmflash","/lfs","lfs",0,RT_NULL)==RT_EOK) {
+		rt_kprintf("LittleFS file system mounted\n");
+	}
+
+    return 1;
+#endif 
+
 }
+
 INIT_ENV_EXPORT(mnt_init);
 
 #ifdef RT_USING_MSH
