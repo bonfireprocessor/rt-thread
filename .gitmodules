@@ -1,3 +1,1 @@
-[submodule "bsp/bonfire_arty/local_packages/eluart"]
-	path = bsp/bonfire_arty/local_packages/eluart
-	url = git@github.com:bonfireprocessor/eluart.git
+
