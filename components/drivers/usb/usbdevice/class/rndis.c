@@ -22,9 +22,23 @@
 #include "rndis.h"
 #include "ndis.h"
 
+
+
+static void _start_dhcpd()
+{
+#ifdef LWIP_USING_DHCPD
+    extern void dhcpd_start(const char *netif_name);
+    dhcpd_start("u1");
+#endif
+
+}
+
+
 /* define RNDIS_DELAY_LINK_UP by menuconfig for delay linkup */
 
-#define DBG_LEVEL           DBG_LOG //DBG_WARNING
+//#define DBG_ENABLE
+
+#define DBG_LEVEL           DBG_WARNING
 #define DBG_SECTION_NAME    "RNDIS"
 #include <rtdbg.h>
 
@@ -83,9 +97,9 @@ static struct udevice_descriptor _dev_desc =
     USB_DESC_LENGTH_DEVICE,   /* bLength */
     USB_DESC_TYPE_DEVICE,     /* type */
     USB_BCD_VERSION,          /* bcdUSB */
-    0xEF,                     /* bDeviceClass */
-    0x04,                     /* bDeviceSubClass */
-    0x01,                     /* bDeviceProtocol */
+    0x02,//0xEF,                     /* bDeviceClass */
+    0x00,//0x04,                     /* bDeviceSubClass */
+    0x00, //0x01,                     /* bDeviceProtocol */
     USB_CDC_BUFSIZE,          /* bMaxPacketSize0 */
     _VENDOR_ID,               /* idVendor */
     _PRODUCT_ID,              /* idProduct */
@@ -107,9 +121,9 @@ const static struct ucdc_comm_descriptor _comm_desc =
         USB_DESC_TYPE_IAD,
         USB_DYNAMIC,
         0x02,
-        USB_CDC_CLASS_COMM,
-        USB_CDC_SUBCLASS_ACM,
-        USB_CDC_PROTOCOL_VENDOR,
+        0xef, //USB_CDC_CLASS_COMM,
+        0x04,//USB_CDC_SUBCLASS_ACM,
+        0x01, //USB_CDC_PROTOCOL_VENDOR,
         0x00,
     },
 #endif
@@ -120,9 +134,9 @@ const static struct ucdc_comm_descriptor _comm_desc =
         USB_DYNAMIC,
         0x00,
         0x01,
-        USB_CDC_CLASS_COMM,
-        USB_CDC_SUBCLASS_ACM,
-        USB_CDC_PROTOCOL_VENDOR,
+        0xef, //USB_CDC_CLASS_COMM,
+        0x04,//USB_CDC_SUBCLASS_ACM,
+        0x01, //USB_CDC_PROTOCOL_VENDOR,
 #ifdef RT_USB_DEVICE_COMPOSITE
         RNDIS_INTF_STR_INDEX,
 #else
@@ -591,6 +605,7 @@ static rt_err_t _rndis_set_response(ufunction_t func,rndis_set_msg_t msg)
         rt_timer_start(&((rt_rndis_eth_t)func->user_data)->timer);
 #else
         eth_device_linkchange(&((rt_rndis_eth_t)func->user_data)->parent, RT_TRUE);
+        _start_dhcpd();
 #endif /* RNDIS_DELAY_LINK_UP */
         break;
 
@@ -1206,18 +1221,21 @@ struct pbuf *rt_rndis_eth_rx(rt_device_t dev)
 
     if(device->rx_length != 0)
     {
+
         /* allocate buffer */
         p = pbuf_alloc(PBUF_LINK, device->rx_length, PBUF_RAM);
         if (p != RT_NULL)
         {
             struct pbuf* q;
 
+            // rt_kprintf("\n----%d bytes\n",device->rx_length); 
+            // int c = 1;
             for (q = p; q != RT_NULL; q= q->next)
             {
                 /* Copy the received frame into buffer from memory pointed by the current ETHERNET DMA Rx descriptor */
                 rt_memcpy(q->payload,
                        (rt_uint8_t *)((device->rx_buffer) + offset),
-                       q->len);
+                       q->len);              
                 offset += q->len;
             }
         }
@@ -1369,6 +1387,10 @@ static rt_err_t _rndis_indicate_status_msg(ufunction_t func, rt_uint32_t status)
     return RT_EOK;
 }
 
+
+
+
+
 /* the delay linkup timer handler. */
 static void timer_timeout(void* parameter)
 {
@@ -1376,6 +1398,7 @@ static void timer_timeout(void* parameter)
     _rndis_indicate_status_msg(((rt_rndis_eth_t)parameter)->func,
                                RNDIS_STATUS_MEDIA_CONNECT);
     eth_device_linkchange(&((rt_rndis_eth_t)parameter)->parent, RT_TRUE);
+    _start_dhcpd();
 }
 #endif /* RNDIS_DELAY_LINK_UP */
 
