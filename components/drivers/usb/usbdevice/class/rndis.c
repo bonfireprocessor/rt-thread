@@ -22,23 +22,15 @@
 #include "rndis.h"
 #include "ndis.h"
 
-
-
-static void _start_dhcpd()
-{
-#ifdef LWIP_USING_DHCPD
-    extern void dhcpd_start(const char *netif_name);
-    dhcpd_start("u1");
-#endif
-
-}
-
+#define RNDIS_STACKSIZE 1024
+#define RNIDS_PRIO 15
 
 /* define RNDIS_DELAY_LINK_UP by menuconfig for delay linkup */
 
 //#define DBG_ENABLE
 
-#define DBG_LEVEL           DBG_WARNING
+#define DBG_LEVEL            DBG_WARNING //DBG_LOG  DBG_WARNING
+//#define DBG_LEVEL            DBG_LOG
 #define DBG_SECTION_NAME    "RNDIS"
 #include <rtdbg.h>
 
@@ -65,6 +57,8 @@ struct rt_rndis_eth
 
 #ifdef RNDIS_DELAY_LINK_UP
     struct rt_timer timer;
+    struct rt_semaphore sem;
+    rt_thread_t rndis_thread;
 #endif /* RNDIS_DELAY_LINK_UP */
 
     ALIGN(4)
@@ -304,6 +298,26 @@ const static rt_uint32_t oid_supported_list[] =
 };
 
 static rt_uint8_t rndis_message_buffer[RNDIS_MESSAGE_BUFFER_SIZE];
+
+
+#ifdef LWIP_USING_DHCPD
+extern void dhcpd_start(const char *netif_name);
+
+#define DHCPD_START()  (dhcpd_start("u1"))
+
+#else
+#define DHCPD_START() 
+#endif
+
+
+// static void _start_dhcpd()
+// {
+// #ifdef LWIP_USING_DHCPD
+//     extern void dhcpd_start(const char *netif_name);
+//     dhcpd_start("u1");
+// #endif
+
+// }
 
 static void _rndis_response_available(ufunction_t func)
 {
@@ -604,8 +618,9 @@ static rt_err_t _rndis_set_response(ufunction_t func,rndis_set_msg_t msg)
         /* link up. */
         rt_timer_start(&((rt_rndis_eth_t)func->user_data)->timer);
 #else
+        LOG_D("Link up\n");
         eth_device_linkchange(&((rt_rndis_eth_t)func->user_data)->parent, RT_TRUE);
-        _start_dhcpd();
+        DHCPD_START();
 #endif /* RNDIS_DELAY_LINK_UP */
         break;
 
@@ -657,7 +672,7 @@ static rt_err_t _rndis_reset_response(ufunction_t func,rndis_set_msg_t msg)
     oid_packet_filter = 0x0000000;
 
     /* link down eth */
-
+    LOG_D("Link Down");
     eth_device_linkchange(&((rt_rndis_eth_t)func->user_data)->parent, RT_FALSE);
 
     /* reset eth rx tx */
@@ -731,6 +746,7 @@ static rt_err_t _rndis_msg_parser(ufunction_t func, rt_uint8_t *msg)
     case REMOTE_NDIS_HALT_MSG:
         LOG_D("REMOTE_NDIS_HALT_MSG");
         /* link down. */
+         LOG_D("Link down\n");
         eth_device_linkchange(&((rt_rndis_eth_t)func->user_data)->parent, RT_FALSE);
 
         /* reset eth rx tx */
@@ -1121,6 +1137,7 @@ static rt_err_t _function_disable(ufunction_t func)
 
 
     /* link down. */
+     LOG_D("Link down\n");
     eth_device_linkchange(&((rt_rndis_eth_t)func->user_data)->parent, RT_FALSE);
 
     /* reset eth rx tx */
@@ -1388,18 +1405,35 @@ static rt_err_t _rndis_indicate_status_msg(ufunction_t func, rt_uint32_t status)
 }
 
 
-
-
-
 /* the delay linkup timer handler. */
 static void timer_timeout(void* parameter)
 {
-    LOG_I("delay link up!");
-    _rndis_indicate_status_msg(((rt_rndis_eth_t)parameter)->func,
-                               RNDIS_STATUS_MEDIA_CONNECT);
-    eth_device_linkchange(&((rt_rndis_eth_t)parameter)->parent, RT_TRUE);
-    _start_dhcpd();
+rt_rndis_eth_t ctx = (rt_rndis_eth_t)parameter;    
+   
+   LOG_D("Link Timer\n");
+   rt_sem_release(&ctx->sem);
 }
+
+
+
+
+static void LinkStatusThread(void *p)
+{
+rt_rndis_eth_t ctx = (rt_rndis_eth_t)p;
+
+    while(1) {
+        rt_sem_take(&ctx->sem,RT_WAITING_FOREVER);
+        LOG_I("delay link up!");
+        _rndis_indicate_status_msg(ctx->func,
+                               RNDIS_STATUS_MEDIA_CONNECT);
+        eth_device_linkchange(&ctx->parent, RT_TRUE);
+        DHCPD_START();
+    }
+}
+
+
+
+
 #endif /* RNDIS_DELAY_LINK_UP */
 
 /**
@@ -1500,6 +1534,10 @@ ufunction_t rt_usbd_function_rndis_create(udevice_t device)
                   _rndis,
                   RT_TICK_PER_SECOND * 2,
                   RT_TIMER_FLAG_ONE_SHOT | RT_TIMER_FLAG_SOFT_TIMER);
+    rt_sem_init(&_rndis->sem,"rndis_lnk",0,RT_IPC_FLAG_FIFO);
+    _rndis->rndis_thread = rt_thread_create("rndis",LinkStatusThread,(void*)_rndis,RNDIS_STACKSIZE,RNIDS_PRIO,10);
+    RT_ASSERT(_rndis->rndis_thread);
+    rt_thread_startup( _rndis->rndis_thread);
 #endif  /* RNDIS_DELAY_LINK_UP */
 
     /* OUI 00-00-00, only for test. */
