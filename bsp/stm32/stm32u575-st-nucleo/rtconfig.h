@@ -123,6 +123,7 @@
 #define RT_USB_DEVICE_COMPOSITE
 #define RT_USB_DEVICE_NONE
 #define RT_USB_DEVICE_RNDIS
+#define RNDIS_DELAY_LINK_UP
 
 /* C/C++ and POSIX layer */
 
