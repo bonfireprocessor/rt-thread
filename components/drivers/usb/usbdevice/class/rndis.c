@@ -336,6 +336,10 @@ static void _rndis_response_available(ufunction_t func)
     }
 }
 
+#ifdef RNDIS_DELAY_LINK_UP
+static void LinkStatusThread(void *p); // forward declaration
+#endif
+
 static rt_err_t _rndis_init_response(ufunction_t func, rndis_init_msg_t msg)
 {
     rndis_init_cmplt_t resp;
@@ -344,7 +348,17 @@ static rt_err_t _rndis_init_response(ufunction_t func, rndis_init_msg_t msg)
     response = rt_malloc(sizeof(struct rt_rndis_response));
     resp = rt_malloc(sizeof(struct rndis_init_cmplt));
 
+    #ifdef RNDIS_DELAY_LINK_UP
+    rt_rndis_eth_t ctx = (rt_rndis_eth_t)func->user_data;
+    // Create thread on first setup message
+    if (ctx->rndis_thread == RT_NULL)
+    {
+        ctx->rndis_thread = rt_thread_create("rndis",LinkStatusThread,(void*)ctx,RNDIS_STACKSIZE,RNIDS_PRIO,10);
+    }
+    if( (response == RT_NULL) || (resp == RT_NULL) || ctx->rndis_thread == RT_NULL )
+    #else
     if( (response == RT_NULL) || (resp == RT_NULL) )
+    #endif
     {
         LOG_E("%s,%d: no memory!", __func__, __LINE__);
 
@@ -356,7 +370,10 @@ static rt_err_t _rndis_init_response(ufunction_t func, rndis_init_msg_t msg)
 
         return -RT_ENOMEM;
     }
-
+    
+    #ifdef RNDIS_DELAY_LINK_UP
+    rt_thread_startup( ctx->rndis_thread);
+    #endif 
     resp->RequestId = msg->RequestId;
     resp->MessageType = REMOTE_NDIS_INITIALIZE_CMPLT;
     resp->MessageLength = sizeof(struct rndis_init_cmplt);
@@ -1535,9 +1552,8 @@ ufunction_t rt_usbd_function_rndis_create(udevice_t device)
                   RT_TICK_PER_SECOND * 2,
                   RT_TIMER_FLAG_ONE_SHOT | RT_TIMER_FLAG_SOFT_TIMER);
     rt_sem_init(&_rndis->sem,"rndis_lnk",0,RT_IPC_FLAG_FIFO);
-    _rndis->rndis_thread = rt_thread_create("rndis",LinkStatusThread,(void*)_rndis,RNDIS_STACKSIZE,RNIDS_PRIO,10);
-    RT_ASSERT(_rndis->rndis_thread);
-    rt_thread_startup( _rndis->rndis_thread);
+    _rndis->rndis_thread = RT_NULL; // Create later on SETUP, to avoid wasting stack space
+      
 #endif  /* RNDIS_DELAY_LINK_UP */
 
     /* OUI 00-00-00, only for test. */
