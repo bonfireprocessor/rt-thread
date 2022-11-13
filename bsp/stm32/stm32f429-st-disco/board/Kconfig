@@ -99,11 +99,21 @@ menu "On-chip Peripheral Drivers"
     config BSP_USING_USBD
         bool "Enable OTGFS as USB device"
         select RT_USING_USB_DEVICE
+        select BSP_USBD_TYPE_HS
         default n
+        if BSP_USING_USBD
+            config  BSP_CALL_LOCAL_USB_INIT
+            bool "Call MX_USB_OTG_FS_PCD_Init in board.c"
+            default y
+        endif    
 
     config BSP_USING_LCD
         bool "Enable LCD"
         default n
+
+    config BSP_USING_TOUCH
+        bool "Enable Touchscreen",
+        default n    
 
     config BSP_USING_LTDC
         bool "Enable LTDC"
