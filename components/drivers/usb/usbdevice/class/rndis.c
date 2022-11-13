@@ -22,9 +22,15 @@
 #include "rndis.h"
 #include "ndis.h"
 
+#define RNDIS_STACKSIZE 1024
+#define RNIDS_PRIO 15
+
 /* define RNDIS_DELAY_LINK_UP by menuconfig for delay linkup */
 
-#define DBG_LEVEL           DBG_LOG //DBG_WARNING
+//#define DBG_ENABLE
+
+#define DBG_LEVEL            DBG_WARNING //DBG_LOG  DBG_WARNING
+//#define DBG_LEVEL            DBG_LOG
 #define DBG_SECTION_NAME    "RNDIS"
 #include <rtdbg.h>
 
@@ -51,6 +57,8 @@ struct rt_rndis_eth
 
 #ifdef RNDIS_DELAY_LINK_UP
     struct rt_timer timer;
+    struct rt_semaphore sem;
+    rt_thread_t rndis_thread;
 #endif /* RNDIS_DELAY_LINK_UP */
 
     ALIGN(4)
@@ -83,9 +91,9 @@ static struct udevice_descriptor _dev_desc =
     USB_DESC_LENGTH_DEVICE,   /* bLength */
     USB_DESC_TYPE_DEVICE,     /* type */
     USB_BCD_VERSION,          /* bcdUSB */
-    0xEF,                     /* bDeviceClass */
-    0x04,                     /* bDeviceSubClass */
-    0x01,                     /* bDeviceProtocol */
+    0x02,//0xEF,                     /* bDeviceClass */
+    0x00,//0x04,                     /* bDeviceSubClass */
+    0x00, //0x01,                     /* bDeviceProtocol */
     USB_CDC_BUFSIZE,          /* bMaxPacketSize0 */
     _VENDOR_ID,               /* idVendor */
     _PRODUCT_ID,              /* idProduct */
@@ -107,9 +115,9 @@ const static struct ucdc_comm_descriptor _comm_desc =
         USB_DESC_TYPE_IAD,
         USB_DYNAMIC,
         0x02,
-        USB_CDC_CLASS_COMM,
-        USB_CDC_SUBCLASS_ACM,
-        USB_CDC_PROTOCOL_VENDOR,
+        0xef, //USB_CDC_CLASS_COMM,
+        0x04,//USB_CDC_SUBCLASS_ACM,
+        0x01, //USB_CDC_PROTOCOL_VENDOR,
         0x00,
     },
 #endif
@@ -120,9 +128,9 @@ const static struct ucdc_comm_descriptor _comm_desc =
         USB_DYNAMIC,
         0x00,
         0x01,
-        USB_CDC_CLASS_COMM,
-        USB_CDC_SUBCLASS_ACM,
-        USB_CDC_PROTOCOL_VENDOR,
+        0xef, //USB_CDC_CLASS_COMM,
+        0x04,//USB_CDC_SUBCLASS_ACM,
+        0x01, //USB_CDC_PROTOCOL_VENDOR,
 #ifdef RT_USB_DEVICE_COMPOSITE
         RNDIS_INTF_STR_INDEX,
 #else
@@ -291,6 +299,26 @@ const static rt_uint32_t oid_supported_list[] =
 
 static rt_uint8_t rndis_message_buffer[RNDIS_MESSAGE_BUFFER_SIZE];
 
+
+#ifdef LWIP_USING_DHCPD
+extern void dhcpd_start(const char *netif_name);
+
+#define DHCPD_START()  (dhcpd_start("u1"))
+
+#else
+#define DHCPD_START() 
+#endif
+
+
+// static void _start_dhcpd()
+// {
+// #ifdef LWIP_USING_DHCPD
+//     extern void dhcpd_start(const char *netif_name);
+//     dhcpd_start("u1");
+// #endif
+
+// }
+
 static void _rndis_response_available(ufunction_t func)
 {
     rt_rndis_eth_t device = (rt_rndis_eth_t)func->user_data;
@@ -308,6 +336,10 @@ static void _rndis_response_available(ufunction_t func)
     }
 }
 
+#ifdef RNDIS_DELAY_LINK_UP
+static void LinkStatusThread(void *p); // forward declaration
+#endif
+
 static rt_err_t _rndis_init_response(ufunction_t func, rndis_init_msg_t msg)
 {
     rndis_init_cmplt_t resp;
@@ -316,7 +348,17 @@ static rt_err_t _rndis_init_response(ufunction_t func, rndis_init_msg_t msg)
     response = rt_malloc(sizeof(struct rt_rndis_response));
     resp = rt_malloc(sizeof(struct rndis_init_cmplt));
 
+    #ifdef RNDIS_DELAY_LINK_UP
+    rt_rndis_eth_t ctx = (rt_rndis_eth_t)func->user_data;
+    // Create thread on first setup message
+    if (ctx->rndis_thread == RT_NULL)
+    {
+        ctx->rndis_thread = rt_thread_create("rndis",LinkStatusThread,(void*)ctx,RNDIS_STACKSIZE,RNIDS_PRIO,10);
+    }
+    if( (response == RT_NULL) || (resp == RT_NULL) || ctx->rndis_thread == RT_NULL )
+    #else
     if( (response == RT_NULL) || (resp == RT_NULL) )
+    #endif
     {
         LOG_E("%s,%d: no memory!", __func__, __LINE__);
 
@@ -328,7 +370,10 @@ static rt_err_t _rndis_init_response(ufunction_t func, rndis_init_msg_t msg)
 
         return -RT_ENOMEM;
     }
-
+    
+    #ifdef RNDIS_DELAY_LINK_UP
+    rt_thread_startup( ctx->rndis_thread);
+    #endif 
     resp->RequestId = msg->RequestId;
     resp->MessageType = REMOTE_NDIS_INITIALIZE_CMPLT;
     resp->MessageLength = sizeof(struct rndis_init_cmplt);
@@ -590,7 +635,9 @@ static rt_err_t _rndis_set_response(ufunction_t func,rndis_set_msg_t msg)
         /* link up. */
         rt_timer_start(&((rt_rndis_eth_t)func->user_data)->timer);
 #else
+        LOG_D("Link up\n");
         eth_device_linkchange(&((rt_rndis_eth_t)func->user_data)->parent, RT_TRUE);
+        DHCPD_START();
 #endif /* RNDIS_DELAY_LINK_UP */
         break;
 
@@ -642,7 +689,7 @@ static rt_err_t _rndis_reset_response(ufunction_t func,rndis_set_msg_t msg)
     oid_packet_filter = 0x0000000;
 
     /* link down eth */
-
+    LOG_D("Link Down");
     eth_device_linkchange(&((rt_rndis_eth_t)func->user_data)->parent, RT_FALSE);
 
     /* reset eth rx tx */
@@ -716,6 +763,7 @@ static rt_err_t _rndis_msg_parser(ufunction_t func, rt_uint8_t *msg)
     case REMOTE_NDIS_HALT_MSG:
         LOG_D("REMOTE_NDIS_HALT_MSG");
         /* link down. */
+         LOG_D("Link down\n");
         eth_device_linkchange(&((rt_rndis_eth_t)func->user_data)->parent, RT_FALSE);
 
         /* reset eth rx tx */
@@ -1106,6 +1154,7 @@ static rt_err_t _function_disable(ufunction_t func)
 
 
     /* link down. */
+     LOG_D("Link down\n");
     eth_device_linkchange(&((rt_rndis_eth_t)func->user_data)->parent, RT_FALSE);
 
     /* reset eth rx tx */
@@ -1206,18 +1255,21 @@ struct pbuf *rt_rndis_eth_rx(rt_device_t dev)
 
     if(device->rx_length != 0)
     {
+
         /* allocate buffer */
         p = pbuf_alloc(PBUF_LINK, device->rx_length, PBUF_RAM);
         if (p != RT_NULL)
         {
             struct pbuf* q;
 
+            // rt_kprintf("\n----%d bytes\n",device->rx_length); 
+            // int c = 1;
             for (q = p; q != RT_NULL; q= q->next)
             {
                 /* Copy the received frame into buffer from memory pointed by the current ETHERNET DMA Rx descriptor */
                 rt_memcpy(q->payload,
                        (rt_uint8_t *)((device->rx_buffer) + offset),
-                       q->len);
+                       q->len);              
                 offset += q->len;
             }
         }
@@ -1369,14 +1421,36 @@ static rt_err_t _rndis_indicate_status_msg(ufunction_t func, rt_uint32_t status)
     return RT_EOK;
 }
 
+
 /* the delay linkup timer handler. */
 static void timer_timeout(void* parameter)
 {
-    LOG_I("delay link up!");
-    _rndis_indicate_status_msg(((rt_rndis_eth_t)parameter)->func,
-                               RNDIS_STATUS_MEDIA_CONNECT);
-    eth_device_linkchange(&((rt_rndis_eth_t)parameter)->parent, RT_TRUE);
+rt_rndis_eth_t ctx = (rt_rndis_eth_t)parameter;    
+   
+   LOG_D("Link Timer\n");
+   rt_sem_release(&ctx->sem);
 }
+
+
+
+
+static void LinkStatusThread(void *p)
+{
+rt_rndis_eth_t ctx = (rt_rndis_eth_t)p;
+
+    while(1) {
+        rt_sem_take(&ctx->sem,RT_WAITING_FOREVER);
+        LOG_I("delay link up!");
+        _rndis_indicate_status_msg(ctx->func,
+                               RNDIS_STATUS_MEDIA_CONNECT);
+        eth_device_linkchange(&ctx->parent, RT_TRUE);
+        DHCPD_START();
+    }
+}
+
+
+
+
 #endif /* RNDIS_DELAY_LINK_UP */
 
 /**
@@ -1477,6 +1551,9 @@ ufunction_t rt_usbd_function_rndis_create(udevice_t device)
                   _rndis,
                   RT_TICK_PER_SECOND * 2,
                   RT_TIMER_FLAG_ONE_SHOT | RT_TIMER_FLAG_SOFT_TIMER);
+    rt_sem_init(&_rndis->sem,"rndis_lnk",0,RT_IPC_FLAG_FIFO);
+    _rndis->rndis_thread = RT_NULL; // Create later on SETUP, to avoid wasting stack space
+      
 #endif  /* RNDIS_DELAY_LINK_UP */
 
     /* OUI 00-00-00, only for test. */
