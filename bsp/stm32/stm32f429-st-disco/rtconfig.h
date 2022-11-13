@@ -100,9 +100,23 @@
 #define RT_USING_I2C_BITOPS
 #define RT_USING_PIN
 #define RT_USING_SPI
+#define RT_USING_TOUCH
 
 /* Using USB */
 
+#define RT_USING_USB
+#define RT_USING_USB_DEVICE
+#define RT_USBD_THREAD_STACK_SZ 4096
+#define USB_VENDOR_ID 0x0FFE
+#define USB_PRODUCT_ID 0x0001
+#define RT_USB_DEVICE_COMPOSITE
+#define RT_USB_DEVICE_CDC
+#define RT_USB_DEVICE_NONE
+#define RT_VCOM_TASK_STK_SIZE 512
+#define RT_CDC_RX_BUFSIZE 128
+#define RT_VCOM_SERNO "32021919830108"
+#define RT_VCOM_SER_LEN 14
+#define RT_VCOM_TX_TIMEOUT 1000
 
 /* POSIX layer and C standard library */
 
@@ -165,12 +179,31 @@
 
 /* LVGL: powerful and easy-to-use embedded GUI library */
 
+#define PKG_USING_LITTLEVGL2RTT
+#define PKG_USING_LITTLEVGL2RTT_LATEST_VERSION
+
+/* LittlevGL2RTT Options */
+
+#define LV_MEM_DYNAMIC
+#define LV_MEM_CUSTOM 1
+#define LV_COLOR_DEPTH_16
+#define LV_COLOR_DEPTH 16
+#define LV_HOR_RES 480
+#define LV_VER_RES 272
+#define LV_DPI 50
+#define LV_GC_DISABLE
+#define LV_ENABLE_GC 0
+#define LITTLEVGL2RTT_USING_DEMO
 
 /* u8g2: a monochrome graphic library */
 
 
 /* PainterEngine: A cross-platform graphics application framework written in C language */
 
+#define PKG_USING_PAINTERENGINE
+#define PKG_USING_PAINTERENGINE_LATEST_VERSION
+#define PKG_USING_PAINTERENGINE_AUX
+#define PKG_USING_PAINTERENGINE_AUX_LATEST_VERSION
 
 /* tools packages */
 
@@ -205,6 +238,9 @@
 
 /* entertainment: terminal games and other interesting software packages */
 
+
+/* RT-Thread local packages */
+
 #define SOC_FAMILY_STM32
 #define SOC_SERIES_STM32F4
 
@@ -221,8 +257,11 @@
 #define BSP_USING_GPIO
 #define BSP_USING_UART
 #define BSP_USING_UART1
+#define BSP_USING_UART2
+#define BSP_UART2_RX_USING_DMA
 #define BSP_USING_FMC
 #define BSP_USING_LCD
+#define BSP_USING_TOUCH
 #define BSP_USING_LTDC
 
 /* Board extended module Drivers */

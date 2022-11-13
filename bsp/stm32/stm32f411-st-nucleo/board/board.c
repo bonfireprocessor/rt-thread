@@ -59,7 +59,7 @@ void SystemClock_Config(void)
 }
 
 
-
+#ifdef BSP_CALL_LOCAL_USB_INIT
 void MX_USB_OTG_FS_PCD_Init( PCD_HandleTypeDef *pcd)
 {
 
@@ -91,3 +91,4 @@ void MX_USB_OTG_FS_PCD_Init( PCD_HandleTypeDef *pcd)
   /* USER CODE END USB_OTG_FS_Init 2 */
 
 }
+#endif
