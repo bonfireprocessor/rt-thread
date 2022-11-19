@@ -222,63 +222,7 @@ trapframe_t t;
     for(int i=3;i<32;i++) {
       *sr++=t.gpr[i];
     }
-    BonfireHandleTrap(&t);
-    f->epc=t.epc;
-    f->mstatus=t.status;
-    f->ra=t.gpr[1];
-    sr = (uint32_t*)&f->gp;
-    for(int i=3;i<32;i++) {
-      *sr++=t.gpr[i];
-    }
 
-
-}
-
-
-void rt_hw_interrupt_init(void)
-{
-    int idx;
-
-    rt_kprintf("rt_hw_interrupt_init\n");
-    /* init exceptions table */
-    for (idx = 0; idx < MAX_HANDLERS; idx++)
-    {
-        rt_hw_interrupt_mask(idx);
-        irq_desc[idx].handler = (rt_isr_handler_t)rt_hw_interrupt_handle;
-        irq_desc[idx].param = RT_NULL;
-#ifdef RT_USING_INTERRUPT_INFO
-        rt_snprintf(irq_desc[idx].name, RT_NAME_MAX - 1, "default");
-        irq_desc[idx].counter = 0;
-#endif
-    }// enable machine external interrupt
-}
-
-/**
- * This function will install a interrupt service routine to a interrupt.
- * @param vector the interrupt number
- * @param handler the interrupt service routine to be installed
- * @param param the interrupt service function parameter
- * @param name the interrupt name
- * @return old handler
- */
-rt_isr_handler_t rt_hw_interrupt_install(int vector, rt_isr_handler_t handler,
-        void *param, const char *name)
-{
-    rt_isr_handler_t old_handler = RT_NULL;
-
-    if(vector < MAX_HANDLERS)
-    {
-        old_handler = irq_desc[vector].handler;
-        if (handler != RT_NULL)
-        {
-            irq_desc[vector].handler = (rt_isr_handler_t)handler;
-            irq_desc[vector].param = param;
-#ifdef RT_USING_INTERRUPT_INFO
-            rt_snprintf(irq_desc[vector].name, RT_NAME_MAX - 1, "%s", name);
-            irq_desc[vector].counter = 0;
-#endif
-        }
-    }
 
 }
 
@@ -330,4 +274,3 @@ rt_isr_handler_t rt_hw_interrupt_install(int vector, rt_isr_handler_t handler,
 
     return old_handler;
 }
-

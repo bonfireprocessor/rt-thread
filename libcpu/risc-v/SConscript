@@ -32,10 +32,10 @@ else:
     else :
             group = group + SConscript(os.path.join('common', 'SConscript'))
 
-# cpu porting code files
-if  rtconfig.CPU == "e9xx" :
-    group = group + SConscript(os.path.join(cwd, rtconfig.VENDOR, rtconfig.CPU, 'SConscript'))
-else :
-    group = group + SConscript(os.path.join(cwd, rtconfig.CPU, 'SConscript'))
+    # cpu porting code files
+    if  rtconfig.CPU == "e9xx" :
+        group = group + SConscript(os.path.join(cwd, rtconfig.VENDOR, rtconfig.CPU, 'SConscript'))
+    else :
+        group = group + SConscript(os.path.join(cwd, rtconfig.CPU, 'SConscript'))
 
 Return('group')

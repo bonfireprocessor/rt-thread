@@ -124,5 +124,4 @@ char rt_hw_console_getchar(void)
 }
 #endif
 
-
 #endif

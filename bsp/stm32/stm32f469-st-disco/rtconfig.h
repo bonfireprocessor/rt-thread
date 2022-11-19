@@ -49,7 +49,7 @@
 #define RT_USING_CONSOLE
 #define RT_CONSOLEBUF_SIZE 128
 #define RT_CONSOLE_DEVICE_NAME "uart3"
-#define RT_VER_NUM 0x40101
+#define RT_VER_NUM 0x50000
 #define ARCH_ARM
 #define RT_USING_CPU_FFS
 #define ARCH_ARM_CORTEX_M
@@ -180,9 +180,8 @@
 
 /* touch drivers */
 
-
-/* Kendryte SDK */
-
+#define PKG_USING_FT6236
+#define PKG_USING_FT6236_LATEST_VERSION
 
 /* Kendryte SDK */
 
@@ -247,13 +246,14 @@
 
 /* Onboard Peripheral Drivers */
 
+#define BSP_USING_STLINK_TO_USART
+#define BSP_USING_LVGL
+#define BSP_USING_LVGL_DEMO
 #define BSP_USING_SDRAM
+#define BSP_USING_TOUCH
+#define BSP_USING_TOUCH_FT6X36
 #define BSP_USING_LCD_MIPI
 #define BSP_USING_LCD_OTM8009A
-#define BSP_USING_LVGL
-#define BSP_USING_TOUCH
-#define BSP_TOUCH_INT_PIN 149
-#define BSP_I2C_NAME "i2c1"
 
 /* On-chip Peripheral Drivers */
 

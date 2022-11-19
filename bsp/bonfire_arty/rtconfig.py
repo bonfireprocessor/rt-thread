@@ -47,7 +47,7 @@ if PLATFORM == 'gcc':
 
     INCDIRS = ' -I./bonfire-sdk/inc -I./bonfire-sdk/boards/ARTY_AXI -I./drivers '
 
-    DEVICE = ' -march=rv32imac -mabi=ilp32 -mstrict-align -mcmodel=medany  -nostartfiles  -lc '
+    DEVICE = ' -march=rv32im -mabi=ilp32 -mstrict-align -mcmodel=medany  -nostartfiles  -lc '
     CFLAGS = DEVICE
     #CFLAGS += ' -save-temps=obj'
     CFLAGS +=  INCDIRS

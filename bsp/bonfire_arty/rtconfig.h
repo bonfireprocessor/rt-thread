@@ -13,6 +13,7 @@
 #define RT_TICK_PER_SECOND 100
 #define RT_USING_OVERFLOW_CHECK
 #define RT_USING_HOOK
+#define RT_HOOK_USING_FUNC_PTR
 #define RT_USING_IDLE_HOOK
 #define RT_IDLE_HOOK_LIST_SIZE 4
 #define IDLE_THREAD_STACK_SIZE 2048
@@ -51,7 +52,7 @@
 #define RT_USING_CONSOLE
 #define RT_CONSOLEBUF_SIZE 128
 #define RT_CONSOLE_DEVICE_NAME "uart0"
-#define RT_VER_NUM 0x40100
+#define RT_VER_NUM 0x50000
 
 /* RT-Thread Components */
 
@@ -60,14 +61,8 @@
 #define RT_MAIN_THREAD_STACK_SIZE 2048
 #define RT_MAIN_THREAD_PRIORITY 10
 #define RT_USING_LEGACY
-
-/* C++ features */
-
-
-/* Command shell */
-
-#define RT_USING_FINSH
 #define RT_USING_MSH
+#define RT_USING_FINSH
 #define FINSH_USING_MSH
 #define FINSH_THREAD_NAME "tshell"
 #define FINSH_THREAD_PRIORITY 17
@@ -79,9 +74,6 @@
 #define MSH_USING_BUILT_IN_COMMANDS
 #define FINSH_USING_DESCRIPTION
 #define FINSH_ARG_MAX 10
-
-/* Device virtual file system */
-
 #define RT_USING_DFS
 #define DFS_USING_POSIX
 #define DFS_USING_WORKDIR
@@ -124,7 +116,7 @@
 /* Using USB */
 
 
-/* POSIX layer and C standard library */
+/* C/C++ and POSIX layer */
 
 #define RT_LIBC_DEFAULT_TIMEZONE 1
 
@@ -139,20 +131,16 @@
 
 /* Socket is in the 'Network' category */
 
-/* Network */
 
-/* Socket abstraction layer */
+/* Network */
 
 #define RT_USING_SAL
 #define SAL_INTERNET_CHECK
 
-/* protocol stack implement */
+/* Docking with protocol stacks */
 
 #define SAL_USING_LWIP
 #define SAL_USING_POSIX
-
-/* Network interface device */
-
 #define RT_USING_NETDEV
 #define NETDEV_USING_IFCONFIG
 #define NETDEV_USING_PING
@@ -160,11 +148,9 @@
 #define NETDEV_USING_AUTO_DEFAULT
 #define NETDEV_IPV4 1
 #define NETDEV_IPV6 0
-
-/* light weight TCP/IP stack */
-
 #define RT_USING_LWIP
 #define RT_USING_LWIP212
+#define RT_USING_LWIP_VER_NUM 0x20102
 #define RT_LWIP_MEM_ALIGNMENT 4
 #define RT_LWIP_IGMP
 #define RT_LWIP_ICMP
@@ -205,12 +191,6 @@
 #define RT_LWIP_NETIF_LOOPBACK
 #define LWIP_NETIF_LOOPBACK 1
 #define RT_LWIP_USING_PING
-
-/* AT commands */
-
-
-/* VBUS(Virtual Software BUS) */
-
 
 /* Utilities */
 
