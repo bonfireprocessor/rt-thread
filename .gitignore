@@ -55,3 +55,4 @@ rt-thread.code-workspace
 ~packages/eluart
 bsp/raspberry-pico/rtthread-pico.uf2
 
+*.code-workspace
