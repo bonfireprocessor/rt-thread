@@ -91,6 +91,8 @@
 #define RT_USING_SERIAL_V1
 #define RT_SERIAL_USING_DMA
 #define RT_SERIAL_RB_BUFSZ 64
+#define RT_USING_I2C
+#define RT_USING_I2C_BITOPS
 #define RT_USING_PIN
 
 /* Using USB */
@@ -152,11 +154,23 @@
 
 /* language packages */
 
+/* JSON: JavaScript Object Notation, a lightweight data-interchange format */
+
+
+/* XML: Extensible Markup Language */
+
 
 /* multimedia packages */
 
 /* LVGL: powerful and easy-to-use embedded GUI library */
 
+#define PKG_USING_LVGL
+#define PKG_LVGL_THREAD_PRIO 20
+#define PKG_LVGL_THREAD_STACK_SIZE 4096
+#define PKG_LVGL_DISP_REFR_PERIOD 5
+#define PKG_LVGL_USING_LATEST_VERSION
+#define PKG_LVGL_VER_NUM 0x99999
+#define PKG_USING_LV_MUSIC_DEMO
 
 /* u8g2: a monochrome graphic library */
 
@@ -172,9 +186,6 @@
 /* enhanced kernel services */
 
 
-/* POSIX extension functions */
-
-
 /* acceleration: Assembly language or algorithmic acceleration packages */
 
 
@@ -186,16 +197,65 @@
 
 /* peripheral libraries and drivers */
 
+/* sensors drivers */
+
+
+/* touch drivers */
+
+
+/* Kendryte SDK */
+
 
 /* AI packages */
 
 
+/* Signal Processing and Control Algorithm Packages */
+
+
 /* miscellaneous packages */
+
+/* project laboratory */
 
 /* samples: kernel and components samples */
 
 
 /* entertainment: terminal games and other interesting software packages */
+
+
+/* Arduino libraries */
+
+
+/* Projects */
+
+
+/* Sensors */
+
+
+/* Display */
+
+
+/* Timing */
+
+
+/* Data Processing */
+
+
+/* Data Storage */
+
+/* Communication */
+
+
+/* Device Control */
+
+
+/* Other */
+
+/* Signal IO */
+
+
+/* Uncategorized */
+
+/* RT-Thread local packages */
 
 #define SOC_FAMILY_STM32
 #define SOC_SERIES_STM32F4
@@ -206,12 +266,27 @@
 
 /* Onboard Peripheral Drivers */
 
+#define BSP_USING_SDRAM
+#define BSP_USING_LCD_MIPI
+#define BSP_USING_LCD_OTM8009A
+#define BSP_USING_LVGL
+#define BSP_USING_TOUCH
+#define BSP_TOUCH_INT_PIN 149
+#define BSP_I2C_NAME "i2c1"
 
 /* On-chip Peripheral Drivers */
 
 #define BSP_USING_GPIO
 #define BSP_USING_UART
 #define BSP_USING_UART3
+#define BSP_USING_I2C1
+
+/* Notice: PB8 --> 24; PB9 --> 25 */
+
+#define BSP_I2C1_SCL_PIN 24
+#define BSP_I2C1_SDA_PIN 25
+#define BSP_USING_FMC
+#define BSP_USING_LTDC
 
 /* Board extended module Drivers */
 
