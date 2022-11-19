@@ -20,7 +20,7 @@
 
 #define LCD_DEVICE(dev)     (struct drv_lcd_device*)(dev)
 
-static LTDC_HandleTypeDef LtdcHandle = {0};
+ LTDC_HandleTypeDef LtdcHandle = {0};
 
 struct drv_lcd_device
 {
@@ -362,7 +362,7 @@ __exit:
 }
 INIT_DEVICE_EXPORT(drv_lcd_hw_init);
 
-#ifdef DRV_DEBUG
+//#ifdef DRV_DEBUG
 #ifdef FINSH_USING_MSH
 int lcd_test()
 {
@@ -399,5 +399,5 @@ int lcd_test()
 }
 MSH_CMD_EXPORT(lcd_test, lcd_test);
 #endif /* FINSH_USING_MSH */
-#endif /* DRV_DEBUG */
+//#endif /* DRV_DEBUG */
 #endif /* BSP_USING_LCD */

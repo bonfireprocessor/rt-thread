@@ -11,6 +11,8 @@
 
 #include "board.h"
 
+LTDC_HandleTypeDef hltdc; // Hack
+
 void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};

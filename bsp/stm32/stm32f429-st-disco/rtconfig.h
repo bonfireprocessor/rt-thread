@@ -162,34 +162,28 @@
 
 /* LVGL: powerful and easy-to-use embedded GUI library */
 
-#define PKG_USING_LITTLEVGL2RTT
-#define PKG_USING_LITTLEVGL2RTT_LATEST_VERSION
-
-/* LittlevGL2RTT Options */
-
-#define LV_MEM_DYNAMIC
-#define LV_MEM_CUSTOM 1
-#define LV_COLOR_DEPTH_16
-#define LV_COLOR_DEPTH 16
-#define LV_HOR_RES 480
-#define LV_VER_RES 272
-#define LV_DPI 50
-#define LV_GC_DISABLE
-#define LV_ENABLE_GC 0
-#define LITTLEVGL2RTT_USING_DEMO
+#define PKG_USING_LVGL
+#define PKG_LVGL_THREAD_PRIO 20
+#define PKG_LVGL_THREAD_STACK_SIZE 4096
+#define PKG_LVGL_DISP_REFR_PERIOD 5
+#define PKG_LVGL_USING_DEMOS
+#define PKG_LVGL_USING_V08020
+#define PKG_LVGL_VER_NUM 0x08020
 
 /* u8g2: a monochrome graphic library */
 
 
 /* PainterEngine: A cross-platform graphics application framework written in C language */
 
-#define PKG_USING_PAINTERENGINE
-#define PKG_USING_PAINTERENGINE_LATEST_VERSION
-#define PKG_USING_PAINTERENGINE_AUX
-#define PKG_USING_PAINTERENGINE_AUX_LATEST_VERSION
 
 /* tools packages */
 
+#define PKG_USING_DHRYSTONE
+#define DHRY_ITERS 320000
+
+/* You may ajust this number to make sure the benchmark runs long enough */
+
+#define PKG_USING_DHRYSTONE_LATEST_VERSION
 
 /* system packages */
 
@@ -292,6 +286,7 @@
 #define BSP_USING_LCD
 #define BSP_USING_TOUCH
 #define BSP_USING_LTDC
+#define BSP_USING_LVGL
 
 /* Board extended module Drivers */
 
