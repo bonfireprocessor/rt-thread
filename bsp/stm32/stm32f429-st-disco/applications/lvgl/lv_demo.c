@@ -29,14 +29,14 @@ static rt_uint8_t lvgl_thread_stack[LV_THREAD_STACK_SIZE];
 
 static void lvgl_entry(void *parameter)
 {
-    extern void lv_demo_music(void);
-    extern void  gui_guider_setup(void);
+  
     extern void lv_demo_widgets(void);
+    extern  void lv_example_get_started_1(void);
 
-    //lv_demo_widgets();
+    lv_demo_widgets();
     
-    //lv_demo_music();
-    //gui_guider_setup();
+ 
+    //lv_example_get_started_1();
 
     while(1)
     {
