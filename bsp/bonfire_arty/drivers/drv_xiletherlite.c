@@ -148,7 +148,7 @@ static uint32_t aligned_buffer[ETH_BUFSIZE_WORDS];
    RT_ASSERT(p->tot_len<=ETH_BUFSIZE_WORDS*4);
    void *dest = (void *)aligned_buffer;
    for (struct pbuf *q=p; q != RT_NULL; q = q->next) {
-       memcpy(dest,q->payload,q->len);
+       rt_memcpy(dest,q->payload,q->len);
        dest+= q->len;
    }
 
@@ -227,7 +227,7 @@ struct pbuf *p = RT_NULL;
               RT_ASSERT(p->tot_len == length); 
               void * src = (void*)currentBuff;  
               for (struct pbuf *q = p; q != RT_NULL; q = q->next) {
-                 memcpy(q->payload,(void*)src,q->len);                
+                 rt_memcpy(q->payload,(void*)src,q->len);                
                  src+=q->len;
               }     
          } else {
