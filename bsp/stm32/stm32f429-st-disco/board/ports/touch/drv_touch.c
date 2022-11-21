@@ -8,8 +8,14 @@
  * 2018-10-03     xuzhuoyi     first implementation.
  */
 
+#include <rtthread.h>
+#include <rtdevice.h>
+#include <board.h>
+
 #include "drv_touch.h"
 #include "drivers/i2c.h"
+#include "lcd_port.h"
+
 
 #ifdef PKG_USING_LITTLEVGL2RTT
 #include "littlevgl2rtt.h"
@@ -129,7 +135,7 @@ static rt_err_t stmpe811_touch_init(rt_device_t dev)
    - \b  0: function succeeded
    - \b -1: function failed
 */
-int32_t touch_uninitialize (void) {
+static int32_t touch_uninitialize (void) {
   touch_write(STMPE811_SYS_CTRL1, 0x02);  /* Reset Touch-screen controller    */
   return 0;
 }
@@ -194,6 +200,16 @@ int32_t touch_get_state(struct touch_state *state)
     return 0;
 }
 
+static rt_err_t touch_control(rt_device_t dev, int cmd, void *args)
+{
+   if (cmd==0) {
+     touch_get_state((struct touch_state*)args);
+     return RT_EOK;
+   } else
+     return RT_ERROR;
+}
+
+
 void touch_show_state()
 {
     int16_t x;
@@ -201,7 +217,7 @@ void touch_show_state()
     struct touch_state ts;
     touch_get_state(&ts);
     x = (3706 - ts.x) / 14;
-    y = (-461 + ts.y) / 10.5;
+    y = LCD_HEIGHT - (-461 + ts.y) / 10.5;
     rt_kprintf("[drv_touch] touch_show_state, x: %d, y: %d, pressed: %d, padding: %d\n", ts.x , ts.y, ts.pressed, ts.padding);
     rt_kprintf("[drv_touch] touch_show_state, phy x: %d, phy y: %d\n", x , y);
 }
@@ -209,16 +225,39 @@ MSH_CMD_EXPORT(touch_show_state, show screen coordinate in touching);
 
 static int rt_hw_touch_init(void)
 {
-    static struct rt_device touch;
+    static struct rt_device touch = {
+       .type = RT_Device_Class_Unknown,
+       .init = stmpe811_touch_init,
+       .control = touch_control,
+       .open = RT_NULL,
+       .close = RT_NULL,
+       .user_data = RT_NULL
+
+    };
 
     /* init device structure */
+   
     touch.type = RT_Device_Class_Unknown;
     touch.init = stmpe811_touch_init;
+    touch.control = touch_control;
     touch.user_data = RT_NULL;
 
     /* register touch device to RT-Thread */
     rt_device_register(&touch, "touch", RT_DEVICE_FLAG_RDWR);
-
+    
     return RT_EOK;
 }
 INIT_BOARD_EXPORT(rt_hw_touch_init);
+
+
+static int init_touch_device()
+{
+  rt_device_t td = rt_device_find("touch");
+  rt_kprintf("PA8=%d\n",GET_PIN(A,8));
+  rt_kprintf("PC9=%d\n",GET_PIN(C,9));
+
+  if (td != RT_NULL) stmpe811_touch_init(td);
+  return RT_EOK;
+}
+
+INIT_ENV_EXPORT(init_touch_device);
