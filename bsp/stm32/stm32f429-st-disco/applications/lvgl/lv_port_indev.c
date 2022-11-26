@@ -27,7 +27,7 @@ struct touch_state ts;
     touch_get_state(&ts);
 
     data->point.x = (3706 - ts.x) / 14;
-    data->point.y = last_y = LCD_HEIGHT - (-461 + ts.y) / 10.5;
+    data->point.y = LCD_HEIGHT - (-461 + ts.y) / 10.5 - 20;
     data->state = ts.pressed?LV_INDEV_STATE_PR:LV_INDEV_STATE_REL;
 }
 
