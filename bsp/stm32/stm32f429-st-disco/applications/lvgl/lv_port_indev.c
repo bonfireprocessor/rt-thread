@@ -7,6 +7,10 @@
  * Date           Author       Notes
  * 2021-10-18     Meco Man     The first version
  */
+
+#include <rtthread.h>
+
+#ifdef PKG_USING_LVGL
 #include <lvgl.h>
 #include <stdbool.h>
 #include <rtdevice.h>
@@ -53,3 +57,5 @@ void lv_port_indev_init(void)
     /*Register the driver in LVGL and save the created input device object*/
     button_indev = lv_indev_drv_register(&indev_drv);
 }
+
+#endif

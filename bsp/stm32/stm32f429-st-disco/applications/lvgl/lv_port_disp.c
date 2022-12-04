@@ -9,6 +9,8 @@
  * 2021-12-24     	Rb         Refresh using dma2d
  */
 #include <rtthread.h>
+#ifdef PKG_USING_LVGL
+
 #include <lvgl.h>
 #include <lcd_port.h>
 #include <stm32f4xx.h>
@@ -87,7 +89,8 @@ void lv_port_disp_init(void)
 {
     rt_err_t result;
     lv_color_t * lv_disp_buf1 = rt_malloc(sizeof(lv_color_t)*DISP_BUF_SIZE);
-    rt_memset(lv_disp_buf1,0,sizeof(lv_color_t)*DISP_BUF_SIZE);
+    lv_color_t * lv_disp_buf2 = rt_malloc(sizeof(lv_color_t)*DISP_BUF_SIZE);
+    //rt_memset(lv_disp_buf1,0,sizeof(lv_color_t)*DISP_BUF_SIZE);
     //static lv_color_t  lv_disp_buf1[DISP_BUF_SIZE] = {0};
 
     lcd_device = rt_device_find("lcd");
@@ -122,7 +125,7 @@ void lv_port_disp_init(void)
     lvgl_dma_config();
 
     /*Initialize `disp_buf` with the buffer(s).*/
-    lv_disp_draw_buf_init(&disp_buf, lv_disp_buf1, RT_NULL, DISP_BUF_SIZE);
+    lv_disp_draw_buf_init(&disp_buf, lv_disp_buf1, lv_disp_buf2, DISP_BUF_SIZE);
 
     lv_disp_drv_init(&disp_drv); /*Basic initialization*/
 
@@ -141,3 +144,5 @@ void lv_port_disp_init(void)
 
     g_disp_drv = disp_drv;
 }
+
+#endif
