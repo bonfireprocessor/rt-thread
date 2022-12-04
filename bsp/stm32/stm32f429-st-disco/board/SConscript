@@ -30,6 +30,9 @@ if GetDepend(['BSP_USING_QSPI']):
 if GetDepend(['BSP_USING_LCD']):
     src += ['ports/ili9341.c']
 
+if GetDepend(['BSP_USING_HW_I2C3']):
+    src += ['ports/i2c_hw.c']    
+
 path =  [cwd]
 path += [cwd + '/CubeMX_Config/Inc']
 path += [cwd + '/ports']
