@@ -253,9 +253,7 @@ INIT_BOARD_EXPORT(rt_hw_touch_init);
 static int init_touch_device()
 {
   rt_device_t td = rt_device_find("touch");
-  rt_kprintf("PA8=%d\n",GET_PIN(A,8));
-  rt_kprintf("PC9=%d\n",GET_PIN(C,9));
-
+ 
   if (td != RT_NULL) stmpe811_touch_init(td);
   return RT_EOK;
 }

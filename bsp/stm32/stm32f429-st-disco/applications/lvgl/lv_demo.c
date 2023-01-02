@@ -27,6 +27,18 @@
 static struct rt_thread lvgl_thread;
 static rt_uint8_t lvgl_thread_stack[LV_THREAD_STACK_SIZE];
 
+
+// With lvgl latest lv_rt_tread_port.c will call this entry point to initialize
+// the user application
+void lv_user_gui_init()
+{
+extern void lv_demo_widgets(void);
+extern  void lv_example_get_started_1(void);    
+ 
+    lv_demo_widgets();
+
+}
+
 static void lvgl_entry(void *parameter)
 {
   
@@ -49,16 +61,23 @@ static int lvgl_demo_init(void)
 {
     rt_thread_t tid;
 
-    rt_thread_init(&lvgl_thread,
-                   "LVGL",
-                   lvgl_entry,
-                   RT_NULL,
-                   &lvgl_thread_stack[0],
-                   sizeof(lvgl_thread_stack),
-                   LV_THREAD_PRIO,
-                   10);
-    rt_thread_startup(&lvgl_thread);
+    // Check if LVGL Thread is already started by the LVGL Package
+    if (rt_thread_find("LVGL")==RT_NULL) {
+
+        rt_thread_init(&lvgl_thread,
+                       "LVGL",
+                       lvgl_entry,
+                       RT_NULL,
+                       &lvgl_thread_stack[0],
+                       sizeof(lvgl_thread_stack),
+                       LV_THREAD_PRIO,
+                       10);
+        rt_thread_startup(&lvgl_thread);
+    }    
 
     return 0;
 }
+
+
+
 INIT_APP_EXPORT(lvgl_demo_init);

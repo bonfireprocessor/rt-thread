@@ -29,8 +29,8 @@
 
 //#define DBG_ENABLE
 
-#define DBG_LEVEL            DBG_WARNING //DBG_LOG  DBG_WARNING
-//#define DBG_LEVEL            DBG_LOG
+//#define DBG_LEVEL            DBG_WARNING //DBG_LOG  DBG_WARNING
+#define DBG_LEVEL            DBG_LOG
 #define DBG_SECTION_NAME    "RNDIS"
 #include <rtdbg.h>
 
@@ -372,7 +372,9 @@ static rt_err_t _rndis_init_response(ufunction_t func, rndis_init_msg_t msg)
     }
     
     #ifdef RNDIS_DELAY_LINK_UP
-    rt_thread_startup( ctx->rndis_thread);
+    if ((ctx->rndis_thread->stat & RT_THREAD_STAT_MASK) == RT_THREAD_INIT) {
+        rt_thread_startup( ctx->rndis_thread);
+    }    
     #endif 
     resp->RequestId = msg->RequestId;
     resp->MessageType = REMOTE_NDIS_INITIALIZE_CMPLT;
@@ -1130,7 +1132,7 @@ static rt_err_t _function_disable(ufunction_t func)
 
 #ifdef  RNDIS_DELAY_LINK_UP
     /* stop link up timer. */
-    rt_timer_stop(&((rt_rndis_eth_t)func->user_data)->timer);
+    rt_timer_stop(&((rt_rndis_eth_t)func->user_data)->timer);    
 #endif /* RNDIS_DELAY_LINK_UP */
 
     /* clean resp chain list. */

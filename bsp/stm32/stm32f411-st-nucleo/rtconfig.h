@@ -49,7 +49,7 @@
 #define RT_USING_CONSOLE
 #define RT_CONSOLEBUF_SIZE 128
 #define RT_CONSOLE_DEVICE_NAME "uart2"
-#define RT_VER_NUM 0x40101
+#define RT_VER_NUM 0x50000
 #define ARCH_ARM
 #define RT_USING_CPU_FFS
 #define ARCH_ARM_CORTEX_M
@@ -74,9 +74,6 @@
 #define MSH_USING_BUILT_IN_COMMANDS
 #define FINSH_USING_DESCRIPTION
 #define FINSH_ARG_MAX 10
-
-/* Device virtual file system */
-
 #define RT_USING_DFS
 #define DFS_USING_POSIX
 #define DFS_USING_WORKDIR
@@ -108,7 +105,8 @@
 #define USB_PRODUCT_ID 0x0001
 #define RT_USB_DEVICE_COMPOSITE
 #define RT_USB_DEVICE_NONE
-#define RT_USB_DEVICE_ECM
+#define RT_USB_DEVICE_RNDIS
+#define RNDIS_DELAY_LINK_UP
 
 /* C/C++ and POSIX layer */
 
@@ -119,26 +117,23 @@
 #define RT_USING_POSIX_FS
 #define RT_USING_POSIX_POLL
 #define RT_USING_POSIX_SELECT
+#define RT_USING_POSIX_SOCKET
 
 /* Interprocess Communication (IPC) */
 
 
 /* Socket is in the 'Network' category */
 
-/* Network */
 
-/* Socket abstraction layer */
+/* Network */
 
 #define RT_USING_SAL
 #define SAL_INTERNET_CHECK
 
-/* protocol stack implement */
+/* Docking with protocol stacks */
 
 #define SAL_USING_LWIP
 #define SAL_USING_POSIX
-
-/* Network interface device */
-
 #define RT_USING_NETDEV
 #define NETDEV_USING_IFCONFIG
 #define NETDEV_USING_PING
@@ -146,11 +141,9 @@
 #define NETDEV_USING_AUTO_DEFAULT
 #define NETDEV_IPV4 1
 #define NETDEV_IPV6 0
-
-/* light weight TCP/IP stack */
-
 #define RT_USING_LWIP
 #define RT_USING_LWIP212
+#define RT_USING_LWIP_VER_NUM 0x20102
 #define RT_LWIP_MEM_ALIGNMENT 4
 #define RT_LWIP_IGMP
 #define RT_LWIP_ICMP
@@ -190,14 +183,8 @@
 #define LWIP_SO_LINGER 0
 #define LWIP_NETIF_LOOPBACK 0
 #define RT_LWIP_USING_PING
-
-/* AT commands */
-
 #define LWIP_USING_DHCPD
 #define DHCPD_SERVER_IP "192.168.171.1"
-
-/* VBUS(Virtual Software BUS) */
-
 
 /* Utilities */
 
@@ -217,6 +204,11 @@
 
 /* Wiced WiFi */
 
+#define PKG_USING_NETUTILS
+#define PKG_NETUTILS_TFTP
+#define PKG_NETUTILS_TELNET
+#define PKG_USING_NETUTILS_LATEST_VERSION
+#define PKG_NETUTILS_VER_NUM 0x99999
 
 /* IoT Cloud */
 
@@ -225,6 +217,11 @@
 
 
 /* language packages */
+
+/* JSON: JavaScript Object Notation, a lightweight data-interchange format */
+
+
+/* XML: Extensible Markup Language */
 
 
 /* multimedia packages */
@@ -263,11 +260,19 @@
 
 /* peripheral libraries and drivers */
 
+/* sensors drivers */
+
+
+/* touch drivers */
+
 
 /* Kendryte SDK */
 
 
 /* AI packages */
+
+
+/* Signal Processing and Control Algorithm Packages */
 
 
 /* miscellaneous packages */
@@ -280,13 +285,42 @@
 /* entertainment: terminal games and other interesting software packages */
 
 
+/* Arduino libraries */
+
+
+/* Projects */
+
+
+/* Sensors */
+
+
+/* Display */
+
+
+/* Timing */
+
+
+/* Data Processing */
+
+
+/* Data Storage */
+
+/* Communication */
+
+
+/* Device Control */
+
+
+/* Other */
+
+/* Signal IO */
+
+
+/* Uncategorized */
+
 /* RT-Thread local packages */
 
-#define PKG_USING_NETUTILS
-#define PKG_NETUTILS_TFTP
-#define PKG_NETUTILS_TELNET
 #define PKG_USING_NETUTILS_LOCAL_VERSION
-#define PKG_NETUTILS_VER_NUM 0x99999
 #define SOC_FAMILY_STM32
 #define SOC_SERIES_STM32F4
 
@@ -296,15 +330,13 @@
 
 /* Onboard Peripheral Drivers */
 
+#define BSP_USING_STLINK_TO_USART
+
 /* On-chip Peripheral Drivers */
 
 #define BSP_USING_GPIO
 #define BSP_USING_UART
 #define BSP_USING_UART2
-#define BSP_USING_SPI
-#define BSP_USING_SPI1
-#define BSP_SPI1_TX_USING_DMA
-#define BSP_SPI1_RX_USING_DMA
 #define BSP_USING_ONCHIP_RTC
 #define BSP_RTC_USING_LSE
 #define BSP_USING_USBD

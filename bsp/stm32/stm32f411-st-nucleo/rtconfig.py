@@ -59,7 +59,7 @@ if PLATFORM == 'gcc':
 
     CXXFLAGS = CFLAGS 
 
-    POST_ACTION = OBJCPY + ' -O binary $TARGET rtthread.bin\n' + SIZE + ' $TARGET \n'  + "st-flash --reset write rtthread.bin 0x8000000\n"
+    POST_ACTION = OBJCPY + ' -O binary $TARGET rtthread.bin\n' + SIZE + ' $TARGET \n' # + "st-flash --reset write rtthread.bin 0x8000000\n"
 
 elif PLATFORM == 'armcc':
     # toolchains

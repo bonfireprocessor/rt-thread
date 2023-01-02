@@ -59,6 +59,7 @@
 #define RT_USING_USER_MAIN
 #define RT_MAIN_THREAD_STACK_SIZE 2048
 #define RT_MAIN_THREAD_PRIORITY 10
+#define RT_USING_LEGACY
 #define RT_USING_MSH
 #define RT_USING_FINSH
 #define FINSH_USING_MSH
@@ -78,7 +79,6 @@
 #define DFS_FILESYSTEMS_MAX 2
 #define DFS_FILESYSTEM_TYPES_MAX 2
 #define DFS_FD_MAX 16
-#define RT_USING_DFS_DEVFS
 
 /* Device Drivers */
 
@@ -167,8 +167,8 @@
 #define PKG_LVGL_DISP_REFR_PERIOD 5
 #define PKG_LVGL_USING_EXAMPLES
 #define PKG_LVGL_USING_DEMOS
-#define PKG_LVGL_USING_V08020
-#define PKG_LVGL_VER_NUM 0x08020
+#define PKG_LVGL_USING_LATEST_VERSION
+#define PKG_LVGL_VER_NUM 0x99999
 
 /* u8g2: a monochrome graphic library */
 

@@ -14,10 +14,10 @@
 #include <poll.h>
 #include <sys/select.h>
 
-#if __GNUC__==11 && __BSD_VISIBLE == 0
-#pragma message "locally define fd_mask"
-typedef __fd_mask	fd_mask;
-#endif
+// #if __GNUC__==11 && __BSD_VISIBLE == 0
+// #pragma message "locally define fd_mask"
+// typedef __fd_mask	fd_mask;
+// #endif
 
 static void fdszero(fd_set *set, int nfds)
 {

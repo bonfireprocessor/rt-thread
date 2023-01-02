@@ -28,7 +28,7 @@ const static struct romfs_dirent _dummy[] =
 //     0x74, 0x68, 0x69, 0x73, 0x20, 0x69, 0x73, 0x20, 0x61, 0x20, 0x66, 0x69, 0x6c, 0x65, 0x21, 0x0d, 0x0a,
 // };
 
-RT_WEAK const struct romfs_dirent _root_dirent[] =
+const struct romfs_dirent _root_dirent[] =
 {
     {ROMFS_DIRENT_DIR, "sd", (rt_uint8_t *)_dummy, 0},//  sizeof(_dummy) / sizeof(_dummy[0])},
 	{ROMFS_DIRENT_DIR, "ram", (rt_uint8_t *)_dummy,0}, //sizeof(_dummy) / sizeof(_dummy[0])},
@@ -36,7 +36,7 @@ RT_WEAK const struct romfs_dirent _root_dirent[] =
     
 };
 
-RT_WEAK const struct romfs_dirent romfs_root =
+const struct romfs_dirent romfs_root =
 {
     ROMFS_DIRENT_DIR, "/", (rt_uint8_t *)_root_dirent, sizeof(_root_dirent) / sizeof(_root_dirent[0])
 };
