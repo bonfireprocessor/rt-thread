@@ -29,8 +29,8 @@
 
 //#define DBG_ENABLE
 
-//#define DBG_LEVEL            DBG_WARNING //DBG_LOG  DBG_WARNING
-#define DBG_LEVEL            DBG_LOG
+#define DBG_LEVEL            DBG_WARNING //DBG_LOG  DBG_WARNING
+//#define DBG_LEVEL            DBG_LOG
 #define DBG_SECTION_NAME    "RNDIS"
 #include <rtdbg.h>
 

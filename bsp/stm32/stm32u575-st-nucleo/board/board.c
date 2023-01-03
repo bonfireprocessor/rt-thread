@@ -91,9 +91,9 @@ rt_uint32_t MX_USB_OTG_FS_PCD_Init(PCD_HandleTypeDef * pcd)
 {
 
   
-  pcd->Init.dev_endpoints = 6;
+  pcd->Init.dev_endpoints = 8; 
   pcd->Init.phy_itface = PCD_PHY_EMBEDDED;
-  pcd->Init.ep0_mps = EP_MPS_64; // Unkommented TH 02.01.23
+  pcd->Init.ep0_mps = EP_MPS_64; // Uncommented TH 02.01.23
   pcd->Init.Sof_enable = DISABLE;
   pcd->Init.low_power_enable = DISABLE;
   pcd->Init.lpm_enable = DISABLE;

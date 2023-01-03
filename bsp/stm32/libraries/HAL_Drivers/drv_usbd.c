@@ -20,6 +20,11 @@
 
 static PCD_HandleTypeDef _stm_pcd;
 static struct udcd _stm_udc;
+
+//#define NEW_USB_EP_POOL
+
+#if  !defined(SOC_SERIES_STM32U5) && !defined(SOC_SERIES_STM32F4)
+
 static struct ep_id _ep_pool[] =
 {
     {0x0,  USB_EP_ATTR_CONTROL,     USB_DIR_INOUT,  64, ID_ASSIGNED  },
@@ -48,6 +53,29 @@ static struct ep_id _ep_pool[] =
 #endif
     {0xFF, USB_EP_ATTR_TYPE_MASK,   USB_DIR_MASK,   0,  ID_ASSIGNED  },
 };
+
+#else
+
+#pragma message "Old EP Pool"
+static struct ep_id _ep_pool[] =
+{
+    {0x0,  USB_EP_ATTR_CONTROL,     USB_DIR_INOUT,  64, ID_ASSIGNED  },
+#ifdef BSP_USBD_EP_ISOC
+    {0x1,  USB_EP_ATTR_ISOC,        USB_DIR_IN,     64, ID_UNASSIGNED},
+    {0x1,  USB_EP_ATTR_ISOC,        USB_DIR_OUT,    64, ID_UNASSIGNED},
+#else
+    {0x1,  USB_EP_ATTR_BULK,        USB_DIR_IN,     64, ID_UNASSIGNED},
+    {0x1,  USB_EP_ATTR_BULK,        USB_DIR_OUT,    64, ID_UNASSIGNED},
+#endif
+    {0x2,  USB_EP_ATTR_INT,         USB_DIR_IN,     64, ID_UNASSIGNED},
+    {0x2,  USB_EP_ATTR_INT,         USB_DIR_OUT,    64, ID_UNASSIGNED},
+    {0x3,  USB_EP_ATTR_BULK,        USB_DIR_IN,     64, ID_UNASSIGNED},
+#if !defined(SOC_SERIES_STM32F1)
+    {0x3,  USB_EP_ATTR_BULK,        USB_DIR_OUT,    64, ID_UNASSIGNED},
+#endif
+    {0xFF, USB_EP_ATTR_TYPE_MASK,   USB_DIR_MASK,   0,  ID_ASSIGNED  },
+};
+#endif 
 
 void USBD_IRQ_HANDLER(void)
 {
